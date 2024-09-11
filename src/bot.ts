@@ -12,15 +12,26 @@
 import TelegramBot from 'node-telegram-bot-api';
 import type {FileOptions} from 'node-telegram-bot-api';
 import { InlineKeyboardButton, InlineKeyboardMarkup } from 'node-telegram-bot-api';
-import {insertMessage, getMessagesFromLastNDays} from "./db";
-import {generateExcelFromQuery} from "./export";
+import {addOrder, getMessagesFromLastNDays, initializeDb} from "./db";
+import {generateExcelFromQuery} from "./helpers/export";
 import fs from 'fs';
+import dotenv from 'dotenv';
+
 // import Calendar from 'telegram-inline-calendar'
 // import {Calendar} from 'telegram-inline-calendar';
 // Listen for '/' command
 
-const token = '7096890402:AAFSfFn91KkieRZfk88Osz_FcqHru2c_ris';
-export const bot = new TelegramBot(token, { polling: true });
+// Load environment variables
+dotenv.config();
+
+// Initialize the database
+(async () => { await initializeDb()})()
+
+// const PasswordHash = process.env.PASSWORD_HASH as string;
+//const match = await bcrypt.compare(password, PasswordHash);
+
+const TelegramToken = process.env.TELEGRAM_TOKEN as string;
+export const bot = new TelegramBot(TelegramToken, { polling: true });
 // const calendar = new Calendar(bot, {
 //     date_format: 'DD-MM-YYYY',
 //     language: 'ru'
@@ -47,7 +58,7 @@ export const bot = new TelegramBot(token, { polling: true });
 //         ],
 //         one_time_keyboard: true
 //     };
-  
+
 //     bot.sendMessage(chatId, "Choose an option:", { reply_markup: options });
 //   }
 
@@ -158,6 +169,7 @@ bot.on('callback_query', (callbackQuery): void => {
 
 // Example bot command to save a message
 bot.onText(/\/save (.+)/, async (msg, match): Promise<void> => {
+    console.log(msg)
     const chatId = msg.chat.id;
     const userId = msg?.from?.id;
     const userMessage = match?.[1];
@@ -167,7 +179,7 @@ bot.onText(/\/save (.+)/, async (msg, match): Promise<void> => {
     }
 
     // await insertMessage(userId, userMessage);
-    await insertMessage({
+    await addOrder({
         user_id: userId,
         comments: userMessage,
         first_name: 'John',
