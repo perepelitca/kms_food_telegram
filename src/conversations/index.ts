@@ -1,8 +1,9 @@
 import { session, Bot } from 'grammy';
 import { createOrder } from './createOrder';
+import { changeOrder } from './changeOrder';
 import { exportOrders } from './exportOrders';
 import { conversations, createConversation } from '@grammyjs/conversations';
-import type { MyContext } from './types';
+import type { MyContext, OrderData, CancelOrderData } from './types';
 
 /**
  * Initialize all conversations
@@ -13,7 +14,7 @@ export const initConversations = (bot: Bot<MyContext>) => {
     session({
       type: 'multi',
       createOrder: {
-        initial: () => ({
+        initial: (): OrderData => ({
           first_name: '',
           last_name: '',
           phone: '',
@@ -22,7 +23,7 @@ export const initConversations = (bot: Bot<MyContext>) => {
         }),
       },
       changeOrder: {
-        initial: () => ({
+        initial: (): OrderData => ({
           first_name: '',
           last_name: '',
           phone: '',
@@ -31,17 +32,21 @@ export const initConversations = (bot: Bot<MyContext>) => {
         }),
       },
       cancelOrder: {
-        initial: () => ({
+        initial: (): CancelOrderData => ({
           last_name: '',
           phone: '',
         }),
       },
       exportOrders: {},
       conversation: {},
+      favoriteIds: {
+        initial: (): Array<string> => [],
+      },
     }),
   );
 
   bot.use(conversations());
   bot.use(createConversation(createOrder));
+  bot.use(createConversation(changeOrder));
   bot.use(createConversation(exportOrders));
 }

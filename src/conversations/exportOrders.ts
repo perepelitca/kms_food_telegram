@@ -18,17 +18,17 @@ export const exportOrders = async (conversation: MyConversation, ctx: MyContext)
     const match = await bcrypt.compare(password?.text ?? '', process.env.PASSWORD_HASH as string);
 
     if (!match) {
-      await ctx.reply('⚠️ Access denied! ⚠️');
+      await ctx.reply(ctx.emoji`${"no_entry"} Access denied! ${"no_entry"}`);
       return;
     } else {
       /**
-       * Add user to admin list if password is correct so that they don't have to enter password again
+       * Add user to admin list if password is correct so that they don't have to enter a password again
        */
       userId && (await addAdmin(String(userId)));
     }
   }
 
-  await ctx.reply(' ✅ Loading orders...');
+  await ctx.reply(ctx.emoji`${"check_mark_button"} Loading orders...`);
   const filename = 'exported_messages.xlsx';
   // Define the file path where the Excel file will be saved
   const filePath = `./${filename}`;

@@ -1,12 +1,13 @@
-import {
-  type Conversation,
-  type ConversationFlavor,
-} from '@grammyjs/conversations';
+import { type Conversation, type ConversationFlavor } from '@grammyjs/conversations';
 import type { DbOrder } from '../db';
 import { Context, SessionFlavor } from 'grammy';
+import { EmojiFlavor } from '@grammyjs/emoji';
 
-type OrderData = Pick<DbOrder, 'first_name' | 'last_name' | 'phone' | 'address' | 'duration'>;
-type CancelOrderData = Pick<DbOrder, 'last_name' | 'phone'>;
+export type OrderData = Pick<
+  DbOrder,
+  'first_name' | 'last_name' | 'phone' | 'address' | 'duration'
+>;
+export type CancelOrderData = Pick<DbOrder, 'last_name' | 'phone'>;
 interface SessionData {
   /**
    * The data for the order that is currently being created
@@ -26,6 +27,8 @@ interface SessionData {
    */
   conversation: any;
   exportOrders: Record<string, string>;
+  favoriteIds: Array<string>;
 }
-export type MyContext = Context & ConversationFlavor & SessionFlavor<SessionData>;
+
+export type MyContext = EmojiFlavor<Context & ConversationFlavor & SessionFlavor<SessionData>>;
 export type MyConversation = Conversation<MyContext>;

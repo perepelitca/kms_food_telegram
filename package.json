@@ -13,6 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "@grammyjs/conversations": "^1.2.0",
+    "@grammyjs/emoji": "^1.2.0",
+    "@grammyjs/menu": "^1.2.2",
     "@grammyjs/storage-free": "^2.4.2",
     "@types/node": "^22.5.4",
     "bcrypt": "^5.1.1",

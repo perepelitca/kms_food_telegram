@@ -316,6 +316,22 @@ export const isAdmin = async (admin_id: string): Promise<boolean> => {
   return Boolean(admin);
 }
 
+/**
+ * Find an order by the last name and phone number
+ * @param lastName. The last name of the person who placed the order
+ * @param phone. The phone number of the person who placed the order
+ */
+export const findOrder = async (lastName: string, phone: string): Promise<Order | null> => {
+  const db = await dbPromise();
+
+  const order = await db.get<Order>(`
+    SELECT * FROM messages
+    WHERE last_name = ? AND phone = ?
+  `, [lastName, phone]);
+
+  return order ?? null
+};
+
 // Function to maintain a maximum of 10,000 records
 // async function maintainMaxRecords(maxRecords: number = 10000) {
 //     const db = await dbPromise();
