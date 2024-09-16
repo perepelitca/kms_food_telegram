@@ -358,6 +358,22 @@ export const findOrderByUserId = async (userId: string): Promise<Order | null> =
   return order ?? null;
 };
 
+/**
+ * Delete all admins from the database
+ */
+export const dropAdmins = async (): Promise<void> => {
+  const db = await dbPromise();
+  await db.run(`DELETE FROM admins`);
+};
+
+/**
+ * Delete all orders from the database
+ */
+export const dropOrders = async (): Promise<void> => {
+  const db = await dbPromise();
+  await db.run(`DELETE FROM orders`);
+};
+
 // TODO
 // Function to maintain a maximum of 10,000 records
 // async function maintainMaxRecords(maxRecords: number = 10000) {

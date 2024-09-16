@@ -1,6 +1,6 @@
 import { Bot } from 'grammy';
 import dotenv from 'dotenv';
-import { initializeDb } from './db';
+import { initializeDb, dropAdmins, dropOrders } from './db';
 import type { BotContext } from './conversations/types';
 import { initConversations } from './conversations';
 import { orderMenu } from './orderMenu';
@@ -30,6 +30,8 @@ bot.use(orderMenu);
 bot.api.setMyCommands([
   { command: 'start', description: 'Заказы 🛍️' },
   { command: 'export', description: 'Скачать xls файл 💾' },
+  { command: 'drop_admins', description: 'Delete admins' },
+  { command: 'drop_orders', description: 'Delete orders' },
 ]);
 
 bot.command('start', async (ctx) => {
@@ -38,6 +40,16 @@ bot.command('start', async (ctx) => {
 
 bot.command('export', async (ctx) => {
   await ctx.conversation.enter(ConversationSession.ExportOrders);
+});
+
+bot.command('drop_admins', async (ctx) => {
+  await dropAdmins();
+  await ctx.reply('All admins have been deleted');
+});
+
+bot.command('drop_orders', async (ctx) => {
+  await dropOrders();
+  await ctx.reply('All orders have been deleted');
 });
 
 bot.start();
