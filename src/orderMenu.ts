@@ -20,7 +20,7 @@ export const orderMenu = new Menu<MyContext>('order-menu')
     },
     async (ctx) => {
       ctx.menu.close();
-     await ctx.conversation.enter('changeOrder')
+      await ctx.conversation.enter('changeOrder');
     },
   )
   .row()
@@ -28,6 +28,6 @@ export const orderMenu = new Menu<MyContext>('order-menu')
     (ctx) => {
       return 'Посмотреть мои заказы ' + `${ctx.emoji`${'nerd_face'}`}`;
     },
-    (ctx) => ctx.reply(ctx.emoji`${"soon_arrow"} Coming soon! ${"soon_arrow"}`)
+    (ctx) => ctx.reply(ctx.emoji`${'soon_arrow'} Coming soon! ${'soon_arrow'}`),
   )
-  .row()
+  .row();

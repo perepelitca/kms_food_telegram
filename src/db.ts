@@ -183,7 +183,7 @@ export const initializeDb = async () => {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS admins (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      admin_id INTEGER UNIQUE
+      admin_id TEXT UNIQUE
     )
   `);
 };
@@ -232,6 +232,7 @@ export interface DbOrder {
 }
 
 export type Order = Omit<DbOrder, 'order_date' | 'id'>;
+export type Admin = Pick<DbOrder, 'user_id'>;
 
 /**
  * Get messages from the last N days
@@ -284,11 +285,9 @@ export const addOrder = async ({
  * Add an admin to the database
  * @param admin_id. The user ID of the admin to add
  */
-export const addAdmin = async (admin_id :string): Promise<void> => {
+export const addAdmin = async (admin_id: string): Promise<void> => {
   const db = await dbPromise();
-  await db.run(
-    'INSERT OR IGNORE INTO admins (admin_id) VALUES (?);', [admin_id],
-  );
+  await db.run('INSERT OR IGNORE INTO admins (admin_id) VALUES (?);', [admin_id]);
 
   // After inserting, check if we need to trim old records
   // await maintainMaxRecords();
@@ -300,22 +299,20 @@ export const addAdmin = async (admin_id :string): Promise<void> => {
  */
 export const getAdminIds = async (): Promise<Array<string>> => {
   const db = await dbPromise();
-  return await db.all<Array<string>>(
-    `SELECT admin_id FROM admins`,
-  );
-}
+  return await db.all<Array<string>>(`SELECT admin_id FROM admins`);
+};
 
 /**
  * Check if a user is an admin
  * @param admin_id. The user ID to check
  */
-export const isAdmin = async (admin_id: string): Promise<boolean> => {
+export const isAdmin = async (admin_id: Admin['user_id']): Promise<boolean> => {
   const db = await dbPromise();
-  const admin = await db.get(
-    `SELECT * FROM admins WHERE admin_id = ?`, [admin_id],
-  );
+  const admin = await db.get<Admin['user_id']>(`SELECT * FROM admins WHERE admin_id = ?`, [
+    admin_id,
+  ]);
   return Boolean(admin);
-}
+};
 
 /**
  * Find an order by the last name and phone number
@@ -324,15 +321,18 @@ export const isAdmin = async (admin_id: string): Promise<boolean> => {
  */
 export const findOrder = async (lastName: string, phone: string): Promise<Order | null> => {
   const db = await dbPromise();
-  const currentUtcIso = dateToUtcIso()
+  const currentUtcIso = dateToUtcIso();
 
-  const order = await db.get<Order>(`
+  const order = await db.get<Order>(
+    `
     SELECT * FROM messages
     WHERE last_name = ? AND phone = ? AND order_date > ?
     ORDER BY order_date ASC
-  `, [lastName, phone, currentUtcIso]);
+  `,
+    [lastName, phone, currentUtcIso],
+  );
 
-  return order ?? null
+  return order ?? null;
 };
 
 // Function to maintain a maximum of 10,000 records

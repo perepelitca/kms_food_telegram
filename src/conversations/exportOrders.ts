@@ -18,7 +18,7 @@ export const exportOrders = async (conversation: MyConversation, ctx: MyContext)
     const match = await bcrypt.compare(password?.text ?? '', process.env.PASSWORD_HASH as string);
 
     if (!match) {
-      await ctx.reply(ctx.emoji`${"no_entry"} Access denied! ${"no_entry"}`);
+      await ctx.reply(ctx.emoji`${'no_entry'} Access denied! ${'no_entry'}`);
       return;
     } else {
       /**
@@ -28,7 +28,7 @@ export const exportOrders = async (conversation: MyConversation, ctx: MyContext)
     }
   }
 
-  await ctx.reply(ctx.emoji`${"check_mark_button"} Loading orders...`);
+  await ctx.reply(ctx.emoji`${'check_mark_button'} Loading orders...`);
   const filename = 'exported_messages.xlsx';
   // Define the file path where the Excel file will be saved
   const filePath = `./${filename}`;

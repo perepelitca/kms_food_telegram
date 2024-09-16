@@ -1,16 +1,23 @@
 {
   "name": "kms_food_telegram",
   "version": "1.0.0",
-  "description": "",
+  "description": "This is awesome telegram bot for food delivery",
   "main": "index.js",
   "scripts": {
     "build": "ncc build src/bot.ts -o dist/ --minify",
     "dev": "npx ts-node-dev --respawn --transpile-only src/bot.ts",
-    "grammy": "npx ts-node-dev --respawn --transpile-only src/grammy.ts"
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
+  },
   "dependencies": {
     "@grammyjs/conversations": "^1.2.0",
     "@grammyjs/emoji": "^1.2.0",
@@ -29,12 +36,18 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@eslint/js": "^9.10.0",
     "@grammyjs/types": "^3.14.0",
     "@types/bcrypt": "^5.0.2",
     "@types/node-telegram-bot-api": "^0.64.7",
     "@vercel/ncc": "^0.38.1",
+    "eslint": "^9.10.0",
+    "globals": "^15.9.0",
+    "husky": "^9.1.6",
     "i": "^0.3.7",
+    "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
-    "ts-node-dev": "^2.0.0"
+    "ts-node-dev": "^2.0.0",
+    "typescript-eslint": "^8.5.0"
   }
 }

@@ -20,7 +20,10 @@ const isPhoneNumber = (phoneNumber: string | undefined): boolean => {
  * @param ctx. The context object
  * @returns Promise with the phone number
  */
-export const askForPhoneNumber = async (conversation: MyConversation, ctx: MyContext): Promise<string> => {
+export const askForPhoneNumber = async (
+  conversation: MyConversation,
+  ctx: MyContext,
+): Promise<string> => {
   let phoneNumber: string;
   const phoneEmoji = ctx.emoji`${'mobile_phone'}`;
 
@@ -29,7 +32,7 @@ export const askForPhoneNumber = async (conversation: MyConversation, ctx: MyCon
       parse_mode: 'MarkdownV2',
     });
     const { message } = await conversation.waitFor(':text');
-    console.log('message', message)
+    console.log('message', message);
     phoneNumber = message?.text?.trim() ?? '';
 
     if (!isPhoneNumber(phoneNumber)) {
