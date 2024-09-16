@@ -2,32 +2,35 @@ import { type Conversation, type ConversationFlavor } from '@grammyjs/conversati
 import type { DbOrder } from '../db';
 import { Context, SessionFlavor } from 'grammy';
 import { EmojiFlavor } from '@grammyjs/emoji';
+import { ConversationSession } from './index';
 
 export type OrderData = Pick<
   DbOrder,
   'first_name' | 'last_name' | 'phone' | 'address' | 'duration' | 'delivery_date' | 'comments'
 >;
-export type CancelOrderData = Pick<DbOrder, 'last_name' | 'phone'>;
+
 interface SessionData {
   /**
    * The data for the order that is currently being created
    */
-  createOrder: OrderData;
+  [ConversationSession.CreateOrder]: OrderData;
+
   /**
    * The data for the order that is currently being changed
    */
-  changeOrder: OrderData;
+  [ConversationSession.ChangeOrder]: OrderData;
+
   /**
-   * The data for the order that is currently being canceled
+   * The data for the order that is currently being shown
    */
-  cancelOrder: CancelOrderData;
+  [ConversationSession.ShowOrders]: OrderData | null;
+
   /**
    * To store conversations per session
    * @see https://t.me/grammyjs/268859
    */
   conversation: never;
-  showOrders: never;
 }
 
-export type MyContext = EmojiFlavor<Context & ConversationFlavor & SessionFlavor<SessionData>>;
-export type MyConversation = Conversation<MyContext>;
+export type BotContext = EmojiFlavor<Context & ConversationFlavor & SessionFlavor<SessionData>>;
+export type BotConversation = Conversation<BotContext>;

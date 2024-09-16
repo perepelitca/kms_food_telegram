@@ -1,5 +1,5 @@
 import { addOrder } from '../db';
-import type { MyConversation, MyContext } from './types';
+import type { BotConversation, BotContext } from './types';
 import { askForPhoneNumber } from '../helpers/phone';
 import { InlineKeyboard } from 'grammy';
 import { getZonedDate, TimeZone, isTodayBefore9am } from '../helpers/datetime';
@@ -57,7 +57,7 @@ export const commentPicker = (): InlineKeyboard =>
   new InlineKeyboard().text('Нет комментариев', 'nocomments');
 
 // Create order conversation where user enters their order details
-export const createOrder = async (conversation: MyConversation, ctx: MyContext) => {
+export const createOrder = async (conversation: BotConversation, ctx: BotContext) => {
   await ctx.reply(ctx.emoji`Начем заказ! ${'handshake_light_skin_tone_no_skin_tone'}`);
   const createOrderSession = conversation.session.createOrder;
 
@@ -164,4 +164,6 @@ export const createOrder = async (conversation: MyConversation, ctx: MyContext) 
 `,
     { parse_mode: 'HTML' },
   );
+
+  return;
 };

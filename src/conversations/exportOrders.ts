@@ -1,6 +1,6 @@
 import { isAdmin, addAdmin } from '../db';
 import { InputFile } from 'grammy';
-import type { MyConversation, MyContext } from './types';
+import type { BotConversation, BotContext } from './types';
 import { generateExcelFromQuery } from '../helpers/export';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
@@ -8,7 +8,7 @@ import bcrypt from 'bcrypt';
 /**
  * Export orders to Excel file. Only admin users can export orders.
  */
-export const exportOrders = async (conversation: MyConversation, ctx: MyContext) => {
+export const exportOrders = async (conversation: BotConversation, ctx: BotContext) => {
   const userId = ctx.from?.id;
   const isAdminUser = userId && (await isAdmin(String(userId)));
 
@@ -45,6 +45,8 @@ export const exportOrders = async (conversation: MyConversation, ctx: MyContext)
     fs.unlinkSync(filePath);
   } catch (err) {
     console.error('File does not exist or failed to send:', err);
-    await ctx.reply('Упс, что-то пошло не так, попробуйте позже');
+    await ctx.reply(ctx.emoji`Упс, что-то пошло не так, попробуйте позже ${'thinking_face'}`);
   }
+
+  return;
 };

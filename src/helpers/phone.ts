@@ -1,4 +1,4 @@
-import type { MyContext, MyConversation } from '../conversations/types';
+import type { BotContext, BotConversation } from '../conversations/types';
 
 /**
  * Regular expression to validate phone numbers.
@@ -21,8 +21,8 @@ const isPhoneNumber = (phoneNumber: string | undefined): boolean => {
  * @returns Promise with the phone number
  */
 export const askForPhoneNumber = async (
-  conversation: MyConversation,
-  ctx: MyContext,
+  conversation: BotConversation,
+  ctx: BotContext,
 ): Promise<string> => {
   let phoneNumber: string;
   const phoneEmoji = ctx.emoji`${'mobile_phone'}`;

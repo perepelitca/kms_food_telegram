@@ -1,10 +1,11 @@
 import { Bot } from 'grammy';
 import dotenv from 'dotenv';
 import { initializeDb } from './db';
-import type { MyContext } from './conversations/types';
+import type { BotContext } from './conversations/types';
 import { initConversations } from './conversations';
 import { orderMenu } from './orderMenu';
 import { emojiParser } from '@grammyjs/emoji';
+import { ConversationSession } from './conversations';
 
 // Load environment variables
 dotenv.config();
@@ -15,7 +16,7 @@ dotenv.config();
 })();
 
 const TelegramToken = process.env.TELEGRAM_TOKEN as string;
-export const bot = new Bot<MyContext>(TelegramToken);
+export const bot = new Bot<BotContext>(TelegramToken);
 
 // Add emoji parser to the bot. This should be added before any other middleware that uses emojis
 bot.use(emojiParser());
@@ -36,17 +37,7 @@ bot.command('start', async (ctx) => {
 });
 
 bot.command('export', async (ctx) => {
-  await ctx.conversation.enter('exportOrders');
+  await ctx.conversation.enter(ConversationSession.ExportOrders);
 });
 
 bot.start();
-
-// bot.command('go', (ctx) => calendar.startNavCalendar(ctx.msg));
-
-// bot.command('change_order', async (ctx) => {
-//   // await ctx.reply("Давайте посмотрим что сделать с заказом", { reply_markup: orderMenu });
-//   // await ctx.conversation.enter('changeOrder');
-// });
-
-// await ctx.answerCallbackQuery();
-// await ctx.editMessageText('Выберите день:', { reply_markup: createDayPicker(selectedMonth) });

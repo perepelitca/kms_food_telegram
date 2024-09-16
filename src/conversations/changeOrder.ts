@@ -1,65 +1,48 @@
-import { findOrderByNameAndPhone } from '../db';
-import type { MyConversation, MyContext } from './types';
+import type { BotConversation, BotContext } from './types';
+import { InlineKeyboard } from 'grammy';
+import { ConversationSession } from './index';
 
-export const changeOrder = async (conversation: MyConversation, ctx: MyContext) => {
-  await ctx.reply('Давайте поможем Вам изменить заказ!');
-  const changeOrderSession = conversation.session.changeOrder;
+// Generate a keyboard for changing the delivery address
+export const changeDeliveryAddressPicker = (): InlineKeyboard => {
+  return new InlineKeyboard()
+    .text('Да ✅', 'change_address:yes')
+    .row()
+    .text('Нет ❌', 'change_address:no');
+};
 
-  await ctx.reply('Введите Вашу фамилию');
-  const { message: lastName } = await conversation.waitFor(':text');
-  changeOrderSession.last_name = lastName?.text ?? '';
+export const changeOrder = async (conversation: BotConversation, ctx: BotContext) => {
+  await ctx.conversation.enter(ConversationSession.ShowOrders);
 
-  await ctx.reply('Ваш телефон в формате 9997772233');
-  const { message: phone } = await conversation.waitFor(':text');
-  changeOrderSession.phone = phone?.text ?? '';
+  if (!conversation.session.showOrders) {
+    // await ctx.conversation.exit()
+    return;
+  }
+  // const {address} = conversation.session.showOrders
+  // Clear the showOrders session data
+  conversation.session.showOrders = null;
 
-  // const { lastName, phoneNumber } = changeOrderSession;
-
-  // ctx.from?.id;
-  const order = await findOrderByNameAndPhone(
-    changeOrderSession.last_name,
-    changeOrderSession.phone,
-  );
-  console.log(order);
-
-  // changeOrderSession.duration = await conversation.form.number((ctx) => {
-  //   const userDuration = parseInt(ctx?.msg?.text ?? '', 10);
-  //   if (userDuration < 1) {
-  //     return 'Количество дней должно быть больше 0';
-  //   }
-  //   return true;
-  // });
+  await ctx.reply(`Вы хотите поменять адрес доставки?`, {
+    reply_markup: changeDeliveryAddressPicker(),
+  });
+  const addressResponse = await conversation.waitForCallbackQuery(/^change_address:(yes|no)$/);
+  const shouldChangeAddress = addressResponse.match[1] === 'yes';
+  const addressEmoji = ctx.emoji`${'round_pushpin'}`;
+  console.log(`!!!!!!!!!!!!`, addressEmoji, shouldChangeAddress);
   //
-  // await ctx.reply('Введите ваше имя');
-  // const { message: firstName } = await conversation.waitFor(':text');
-  // changeOrderSession.first_name = firstName?.text ?? '';
+  // return
   //
-  // await ctx.reply('Ваша фамилия');
-  // const { message: lastName } = await conversation.waitFor(':text');
-  // changeOrderSession.last_name = lastName?.text ?? '';
-  //
-  // await ctx.reply('Ваш телефон в формате 9997772233');
-  // const { message: phoneNumber } = await conversation.waitFor(':text');
-  // changeOrderSession.phone = phoneNumber?.text ?? '';
-  //
-  // await ctx.reply('Ваш адрес');
-  // const { message: userAddress } = await conversation.waitFor(':text');
-  // changeOrderSession.address = userAddress?.text ?? '';
-  //
-  // const { first_name, last_name, phone, address, duration } = changeOrderSession;
-  //
-  // if (ctx.chatId) {
-  //   await addOrder({
-  //     user_id: ctx.chatId,
-  //     comments: 'comment',
-  //     first_name,
-  //     last_name,
-  //     phone,
-  //     address,
-  //     delivery_date: '2021-10-10',
-  //     duration,
+  // if (!shouldChangeAddress) {
+  //   await ctx.reply(`Хорошо! Адрес ${addressEmoji} останется прежним: ***  ***`, {
+  //     parse_mode: 'MarkdownV2',
   //   });
-  //
-  //   await ctx.reply(`${changeOrderSession.first_name}, ваш заказ принят!`);
+  //   // await ctx.conversation.exit()
+  //   return
   // }
+  //
+  // await ctx.reply(`Введите новый адрес доставки ${addressEmoji}`, {
+  //   parse_mode: 'MarkdownV2',
+  // });
+  // const { message: userAddress } = await conversation.waitFor(':text');
+  //
+  // console.log(`!!!!!!!!!!!!`, userAddress)
 };

@@ -345,6 +345,7 @@ export const findOrderByNameAndPhone = async (
 export const findOrderByUserId = async (userId: string): Promise<Order | null> => {
   const db = await dbPromise();
 
+  // Get the last order by the user
   const order = await db.get<Order>(
     `
     SELECT * FROM messages
@@ -357,6 +358,7 @@ export const findOrderByUserId = async (userId: string): Promise<Order | null> =
   return order ?? null;
 };
 
+// TODO
 // Function to maintain a maximum of 10,000 records
 // async function maintainMaxRecords(maxRecords: number = 10000) {
 //     const db = await dbPromise();

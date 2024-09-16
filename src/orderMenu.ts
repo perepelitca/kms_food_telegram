@@ -1,7 +1,8 @@
 import { Menu } from '@grammyjs/menu';
-import type { MyContext } from './conversations/types';
+import type { BotContext } from './conversations/types';
+import { ConversationSession } from './conversations';
 
-export const orderMenu = new Menu<MyContext>('order-menu')
+export const orderMenu = new Menu<BotContext>('order-menu')
   .text(
     (ctx) => {
       return (
@@ -9,7 +10,7 @@ export const orderMenu = new Menu<MyContext>('order-menu')
       );
     },
     async (ctx) => {
-      await ctx.conversation.enter('createOrder');
+      await ctx.conversation.enter(ConversationSession.CreateOrder);
       ctx.menu.close();
     },
   )
@@ -20,7 +21,7 @@ export const orderMenu = new Menu<MyContext>('order-menu')
     },
     async (ctx) => {
       ctx.menu.close();
-      await ctx.conversation.enter('changeOrder');
+      await ctx.conversation.enter(ConversationSession.ChangeOrder);
     },
   )
   .row()
@@ -30,7 +31,7 @@ export const orderMenu = new Menu<MyContext>('order-menu')
     },
     async (ctx) => {
       ctx.menu.close();
-      await ctx.conversation.enter('showOrders');
+      await ctx.conversation.enter(ConversationSession.ShowOrders);
     },
   )
   .row();

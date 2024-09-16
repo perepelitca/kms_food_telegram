@@ -1,11 +1,12 @@
-import type { MyContext, MyConversation } from './types';
+import type { BotContext, BotConversation } from './types';
 import { findOrderByUserId } from '../db';
 
 /**
  * Show all orders that belong to the user
  */
-export const showOrders = async (_conversation: MyConversation, ctx: MyContext) => {
+export const showOrders = async (conversation: BotConversation, ctx: BotContext) => {
   const userId = ctx.from?.id;
+  conversation.session.showOrders = null;
 
   if (!userId) {
     await ctx.reply(ctx.emoji`Не можем найти заказы... ${'person_shrugging'}`);
@@ -19,6 +20,7 @@ export const showOrders = async (_conversation: MyConversation, ctx: MyContext) 
     return;
   }
 
+  conversation.session.showOrders = lastOrder;
   const { last_name, phone, address, duration, comments, delivery_date } = lastOrder;
 
   await ctx.reply(
@@ -34,4 +36,6 @@ export const showOrders = async (_conversation: MyConversation, ctx: MyContext) 
 `,
     { parse_mode: 'HTML' },
   );
+
+  return;
 };
