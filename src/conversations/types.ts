@@ -5,7 +5,7 @@ import { EmojiFlavor } from '@grammyjs/emoji';
 
 export type OrderData = Pick<
   DbOrder,
-  'first_name' | 'last_name' | 'phone' | 'address' | 'duration'
+  'first_name' | 'last_name' | 'phone' | 'address' | 'duration' | 'delivery_date' | 'comments'
 >;
 export type CancelOrderData = Pick<DbOrder, 'last_name' | 'phone'>;
 interface SessionData {
@@ -26,8 +26,6 @@ interface SessionData {
    * @see https://t.me/grammyjs/268859
    */
   conversation: any;
-  exportOrders: Record<string, string>;
-  favoriteIds: Array<string>;
 }
 
 export type MyContext = EmojiFlavor<Context & ConversationFlavor & SessionFlavor<SessionData>>;

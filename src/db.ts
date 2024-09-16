@@ -175,6 +175,7 @@ export const initializeDb = async () => {
       order_date TEXT
     )
   `);
+
   /**
    * Create the admins table if it doesn't exist. This table is used to store the user IDs of the admins.
    * When admin is found in this table, they don't need to enter the password to export the orders.
@@ -323,11 +324,13 @@ export const isAdmin = async (admin_id: string): Promise<boolean> => {
  */
 export const findOrder = async (lastName: string, phone: string): Promise<Order | null> => {
   const db = await dbPromise();
+  const currentUtcIso = dateToUtcIso()
 
   const order = await db.get<Order>(`
     SELECT * FROM messages
-    WHERE last_name = ? AND phone = ?
-  `, [lastName, phone]);
+    WHERE last_name = ? AND phone = ? AND order_date > ?
+    ORDER BY order_date ASC
+  `, [lastName, phone, currentUtcIso]);
 
   return order ?? null
 };

@@ -20,6 +20,7 @@ export const initConversations = (bot: Bot<MyContext>) => {
           phone: '',
           address: '',
           duration: 0,
+          delivery_date: '',
         }),
       },
       changeOrder: {
@@ -29,6 +30,7 @@ export const initConversations = (bot: Bot<MyContext>) => {
           phone: '',
           address: '',
           duration: 0,
+          delivery_date: '',
         }),
       },
       cancelOrder: {
@@ -37,11 +39,7 @@ export const initConversations = (bot: Bot<MyContext>) => {
           phone: '',
         }),
       },
-      exportOrders: {},
       conversation: {},
-      favoriteIds: {
-        initial: (): Array<string> => [],
-      },
     }),
   );
 

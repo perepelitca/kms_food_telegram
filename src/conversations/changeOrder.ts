@@ -15,6 +15,7 @@ export const changeOrder = async (conversation: MyConversation, ctx: MyContext) 
 
   // const { lastName, phoneNumber } = changeOrderSession;
 
+  // ctx.from?.id;
   const order = await findOrder(changeOrderSession.last_name, changeOrderSession.phone);
   console.log(order);
 
