@@ -25,7 +25,8 @@ interface SessionData {
    * To store conversations per session
    * @see https://t.me/grammyjs/268859
    */
-  conversation: any;
+  conversation: never;
+  showOrders: never;
 }
 
 export type MyContext = EmojiFlavor<Context & ConversationFlavor & SessionFlavor<SessionData>>;

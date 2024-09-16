@@ -28,6 +28,9 @@ export const orderMenu = new Menu<MyContext>('order-menu')
     (ctx) => {
       return 'Посмотреть мои заказы ' + `${ctx.emoji`${'nerd_face'}`}`;
     },
-    (ctx) => ctx.reply(ctx.emoji`${'soon_arrow'} Coming soon! ${'soon_arrow'}`),
+    async (ctx) => {
+      ctx.menu.close();
+      await ctx.conversation.enter('showOrders');
+    },
   )
   .row();

@@ -1,4 +1,4 @@
-import { findOrder } from '../db';
+import { findOrderByNameAndPhone } from '../db';
 import type { MyConversation, MyContext } from './types';
 
 export const changeOrder = async (conversation: MyConversation, ctx: MyContext) => {
@@ -16,7 +16,10 @@ export const changeOrder = async (conversation: MyConversation, ctx: MyContext) 
   // const { lastName, phoneNumber } = changeOrderSession;
 
   // ctx.from?.id;
-  const order = await findOrder(changeOrderSession.last_name, changeOrderSession.phone);
+  const order = await findOrderByNameAndPhone(
+    changeOrderSession.last_name,
+    changeOrderSession.phone,
+  );
   console.log(order);
 
   // changeOrderSession.duration = await conversation.form.number((ctx) => {

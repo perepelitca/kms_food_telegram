@@ -141,7 +141,7 @@ export const createOrder = async (conversation: MyConversation, ctx: MyContext) 
     createOrderSession;
 
   await addOrder({
-    user_id: String(ctx.from?.id) ?? '',
+    user_id: String(ctx.from?.id ?? ''),
     comments,
     first_name,
     last_name,

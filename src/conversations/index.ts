@@ -2,6 +2,7 @@ import { session, Bot } from 'grammy';
 import { createOrder } from './createOrder';
 import { changeOrder } from './changeOrder';
 import { exportOrders } from './exportOrders';
+import { showOrders } from './showOrders';
 import { conversations, createConversation } from '@grammyjs/conversations';
 import type { MyContext, OrderData, CancelOrderData } from './types';
 
@@ -39,6 +40,7 @@ export const initConversations = (bot: Bot<MyContext>) => {
           phone: '',
         }),
       },
+      showOrders: {},
       conversation: {},
     }),
   );
@@ -47,4 +49,5 @@ export const initConversations = (bot: Bot<MyContext>) => {
   bot.use(createConversation(createOrder));
   bot.use(createConversation(changeOrder));
   bot.use(createConversation(exportOrders));
+  bot.use(createConversation(showOrders));
 };

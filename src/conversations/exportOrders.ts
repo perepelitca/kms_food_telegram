@@ -20,11 +20,11 @@ export const exportOrders = async (conversation: MyConversation, ctx: MyContext)
     if (!match) {
       await ctx.reply(ctx.emoji`${'no_entry'} Access denied! ${'no_entry'}`);
       return;
-    } else {
+    } else if (userId) {
       /**
        * Add user to admin list if password is correct so that they don't have to enter a password again
        */
-      userId && (await addAdmin(String(userId)));
+      await addAdmin(String(userId));
     }
   }
 

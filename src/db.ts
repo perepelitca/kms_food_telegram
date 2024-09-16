@@ -319,7 +319,10 @@ export const isAdmin = async (admin_id: Admin['user_id']): Promise<boolean> => {
  * @param lastName. The last name of the person who placed the order
  * @param phone. The phone number of the person who placed the order
  */
-export const findOrder = async (lastName: string, phone: string): Promise<Order | null> => {
+export const findOrderByNameAndPhone = async (
+  lastName: string,
+  phone: string,
+): Promise<Order | null> => {
   const db = await dbPromise();
   const currentUtcIso = dateToUtcIso();
 
@@ -330,6 +333,25 @@ export const findOrder = async (lastName: string, phone: string): Promise<Order 
     ORDER BY order_date ASC
   `,
     [lastName, phone, currentUtcIso],
+  );
+
+  return order ?? null;
+};
+
+/**
+ * Find an order by the user ID
+ * @param userId. The user ID of the person who placed the order. This is Telegram's user ID.
+ */
+export const findOrderByUserId = async (userId: string): Promise<Order | null> => {
+  const db = await dbPromise();
+
+  const order = await db.get<Order>(
+    `
+    SELECT * FROM messages
+    WHERE user_id = ?
+    ORDER BY order_date DESC
+  `,
+    [userId],
   );
 
   return order ?? null;
