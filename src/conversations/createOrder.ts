@@ -27,7 +27,9 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
   const keyboard = new InlineKeyboard();
 
   for (let day = 1; day <= daysInMonth; day++) {
-    const dayDate = getZonedDate(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day));
+    const dayDate = getZonedDate(
+      new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day),
+    );
 
     // Skip past dates
     if (isBefore(dayDate, currentDate)) continue;
@@ -138,21 +140,20 @@ export const createOrder = async (conversation: MyConversation, ctx: MyContext) 
   const { first_name, last_name, phone, address, duration, comments, delivery_date } =
     createOrderSession;
 
-  if (ctx.chatId) {
-    await addOrder({
-      user_id: ctx.from?.id ?? ctx.chatId,
-      comments,
-      first_name,
-      last_name,
-      phone,
-      address,
-      delivery_date,
-      duration,
-    });
+  await addOrder({
+    user_id: String(ctx.from?.id) ?? '',
+    comments,
+    first_name,
+    last_name,
+    phone,
+    address,
+    delivery_date,
+    duration,
+  });
 
-    await ctx.reply(
-      `
-<b>${last_name},</b> ваш заказ принят!,
+  await ctx.reply(
+    `
+<b>${last_name},</b> ваш заказ принят! 🎉
 <pre>
 Телефон:          ${phone}
 Адрес:            ${address}
@@ -161,7 +162,6 @@ export const createOrder = async (conversation: MyConversation, ctx: MyContext) 
 Комментарии:      ${comments}
 </pre>
 `,
-      { parse_mode: 'HTML' },
-    );
-  }
+    { parse_mode: 'HTML' },
+  );
 };

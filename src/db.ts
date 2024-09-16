@@ -164,7 +164,7 @@ export const initializeDb = async () => {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER,
+      user_id TEXT,
       first_name TEXT,
       last_name TEXT,
       phone TEXT,
@@ -196,7 +196,7 @@ export interface DbOrder {
   /**
    * The user ID of the person who placed the order
    */
-  user_id: number;
+  user_id: string;
   /**
    * The first name of the person who placed the order
    */
