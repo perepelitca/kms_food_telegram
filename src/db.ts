@@ -162,7 +162,7 @@ export const initializeDb = async () => {
    * Create the orders table if it doesn't exist
    */
   await db.exec(`
-    CREATE TABLE IF NOT EXISTS messages (
+    CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id TEXT,
       first_name TEXT,
@@ -235,13 +235,13 @@ export type Order = Omit<DbOrder, 'order_date' | 'id'>;
 export type Admin = Pick<DbOrder, 'user_id'>;
 
 /**
- * Get messages from the last N days
+ * Get orders from the last N days
  * @param days. The number of days to look back
  */
-export const getMessagesFromLastNDays = async (days: number): Promise<Array<DbOrder>> => {
+export const getOrdersFromLastNDays = async (days: number): Promise<Array<DbOrder>> => {
   const db = await dbPromise();
   return await db.all<Array<DbOrder>>(
-    `SELECT * FROM messages WHERE order_date >= datetime('now', ?)`,
+    `SELECT * FROM orders WHERE order_date >= datetime('now', ?)`,
     [`-${days} days`],
   );
 };
@@ -263,7 +263,7 @@ export const addOrder = async ({
   const db = await dbPromise();
   const orderTimestamp = dateToUtcIso();
   await db.run(
-    'INSERT INTO messages (user_id, first_name, last_name, phone, address, comments, delivery_date, duration, order_date) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?)',
+    'INSERT INTO orders (user_id, first_name, last_name, phone, address, comments, delivery_date, duration, order_date) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?)',
     [
       user_id,
       first_name,
@@ -328,7 +328,7 @@ export const findOrderByNameAndPhone = async (
 
   const order = await db.get<Order>(
     `
-    SELECT * FROM messages
+    SELECT * FROM orders
     WHERE last_name = ? AND phone = ? AND order_date > ?
     ORDER BY order_date ASC
   `,
@@ -348,7 +348,7 @@ export const findOrderByUserId = async (userId: string): Promise<Order | null> =
   // Get the last order by the user
   const order = await db.get<Order>(
     `
-    SELECT * FROM messages
+    SELECT * FROM orders
     WHERE user_id = ?
     ORDER BY order_date DESC
   `,
@@ -364,16 +364,16 @@ export const findOrderByUserId = async (userId: string): Promise<Order | null> =
 //     const db = await dbPromise();
 //
 //     // Get the current number of records
-//     const { count } = await db.get('SELECT COUNT(*) as count FROM messages');
+//     const { count } = await db.get('SELECT COUNT(*) as count FROM orders');
 //
 //     if (count > maxRecords) {
 //         const recordsToDelete = count - maxRecords;
 //
 //         // Delete the oldest records
 //         await db.run(`
-//       DELETE FROM messages
+//       DELETE FROM orders
 //       WHERE id IN (
-//         SELECT id FROM messages ORDER BY timestamp ASC LIMIT ?
+//         SELECT id FROM orders ORDER BY timestamp ASC LIMIT ?
 //       )
 //     `, [recordsToDelete]);
 //     }

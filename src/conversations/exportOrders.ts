@@ -35,7 +35,7 @@ export const exportOrders = async (conversation: BotConversation, ctx: BotContex
 
   try {
     // Generate the Excel file
-    await generateExcelFromQuery('SELECT * FROM messages', filePath);
+    await generateExcelFromQuery('SELECT * FROM orders', filePath);
 
     // Create a Readable stream from the file
     const fileStream = fs.createReadStream(filePath);
