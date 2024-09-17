@@ -5,6 +5,7 @@ import { InlineKeyboard } from 'grammy';
 import { getZonedDate, TimeZone, isTodayBefore9am } from '../helpers/datetime';
 import { addMonths, getDaysInMonth, isBefore } from 'date-fns';
 import { format } from 'date-fns-tz';
+import { showOrderInfo } from '../helpers/showOrderInfo';
 
 // Generate a keyboard for the user to select a month
 export const createMonthPicker = (): InlineKeyboard => {
@@ -53,6 +54,7 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
   return keyboard;
 };
 
+// Generate a keyboard for the user to select if they have comments
 export const commentPicker = (): InlineKeyboard =>
   new InlineKeyboard().text('Нет комментариев', 'nocomments');
 
@@ -61,6 +63,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
   await ctx.reply(ctx.emoji`Начем заказ! ${'handshake_light_skin_tone_no_skin_tone'}`);
   const createOrderSession = conversation.session.createOrder;
 
+  // Duration of the order
   const durationEmoji = ctx.emoji`${'keycap_digit_one'}${'keycap_digit_two'}${'keycap_digit_three'}`;
   await ctx.reply(`***На сколько дней заказываете?*** ${durationEmoji}`, {
     parse_mode: 'MarkdownV2',
@@ -73,6 +76,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
     return true;
   });
 
+  // Delivery date
   const monthEmoji = ctx.emoji`${'calendar'}`;
   await ctx.reply(`***Выберите месяц:*** ${monthEmoji}`, {
     reply_markup: createMonthPicker(),
@@ -97,6 +101,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
   });
   createOrderSession.delivery_date = dayResponse.match[1] ?? '';
 
+  // First name
   const firstNameEmoji = ctx.emoji`${'person_raising_hand'}`;
   await ctx.reply(`***Введите ваше имя*** ${firstNameEmoji}`, {
     parse_mode: 'MarkdownV2',
@@ -104,6 +109,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
   const { message: firstName } = await conversation.waitFor(':text');
   createOrderSession.first_name = firstName?.text ?? '';
 
+  // Last name
   const lastNameEmoji = ctx.emoji`${'passport_control'}`;
   await ctx.reply(`***Ваша фамилия*** ${lastNameEmoji}`, {
     parse_mode: 'MarkdownV2',
@@ -111,15 +117,18 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
   const { message: lastName } = await conversation.waitFor(':text');
   createOrderSession.last_name = lastName?.text ?? '';
 
+  // Phone number
   createOrderSession.phone = await askForPhoneNumber(conversation, ctx);
 
+  // Delivery address
   const addressEmoji = ctx.emoji`${'round_pushpin'}`;
-  await ctx.reply(`Ваш адрес ${addressEmoji}`, {
+  await ctx.reply(`***Ваш адрес*** ${addressEmoji}`, {
     parse_mode: 'MarkdownV2',
   });
   const { message: userAddress } = await conversation.waitFor(':text');
   createOrderSession.address = userAddress?.text ?? '';
 
+  // Order comments (if any)
   const commentEmoji = ctx.emoji`${'scroll'}`;
   await ctx.reply(
     `***Укажите комментарий к заказу \\(аллергии, предпочтения и т\\.д\\.\\)*** ${commentEmoji} \n _Если нет комментариев, просто нажмите кнопку_`,
@@ -150,19 +159,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
     duration,
   });
 
-  await ctx.reply(
-    `
-<b>${first_name},</b> ваш заказ принят! 🎉
-<pre>
-Телефон:          ${phone}
-Адрес:            ${address}
-На сколько дней:  ${duration}
-Дата доставки:    ${delivery_date}
-Комментарии:      ${comments}
-</pre>
-`,
-    { parse_mode: 'HTML' },
-  );
+  await showOrderInfo(ctx, createOrderSession, 'ваш заказ принят!');
 
   return;
 };

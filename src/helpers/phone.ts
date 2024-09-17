@@ -32,7 +32,6 @@ export const askForPhoneNumber = async (
       parse_mode: 'MarkdownV2',
     });
     const { message } = await conversation.waitFor(':text');
-    console.log('message', message);
     phoneNumber = message?.text?.trim() ?? '';
 
     if (!isPhoneNumber(phoneNumber)) {

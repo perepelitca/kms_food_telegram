@@ -42,6 +42,10 @@ export const initConversations = (bot: Bot<BotContext>) => {
         }),
       },
       [ConversationSession.ShowOrders]: {},
+      /**
+       * To store conversations per session
+       * @see https://t.me/grammyjs/268859
+       */
       conversation: {},
     }),
   );

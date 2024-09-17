@@ -23,7 +23,7 @@ interface SessionData {
   /**
    * The data for the order that is currently being shown
    */
-  [ConversationSession.ShowOrders]: OrderData | null;
+  [ConversationSession.ShowOrders]: DbOrder | null;
 
   /**
    * To store conversations per session

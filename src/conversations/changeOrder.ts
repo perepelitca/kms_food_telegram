@@ -1,6 +1,8 @@
 import type { BotConversation, BotContext } from './types';
 import { InlineKeyboard } from 'grammy';
-import { ConversationSession } from './index';
+import { getOrder } from '../helpers/getOrder';
+import { updateOrderDeliveryAddress } from '../db';
+import { showOrderInfo } from '../helpers/showOrderInfo';
 
 // Generate a keyboard for changing the delivery address
 export const changeDeliveryAddressPicker = (): InlineKeyboard => {
@@ -11,13 +13,13 @@ export const changeDeliveryAddressPicker = (): InlineKeyboard => {
 };
 
 export const changeOrder = async (conversation: BotConversation, ctx: BotContext) => {
-  await ctx.conversation.enter(ConversationSession.ShowOrders);
+  await getOrder(conversation, ctx);
 
   if (!conversation.session.showOrders) {
-    // await ctx.conversation.exit()
     return;
   }
-  // const {address} = conversation.session.showOrders
+
+  const order = conversation.session.showOrders;
   // Clear the showOrders session data
   conversation.session.showOrders = null;
 
@@ -26,23 +28,21 @@ export const changeOrder = async (conversation: BotConversation, ctx: BotContext
   });
   const addressResponse = await conversation.waitForCallbackQuery(/^change_address:(yes|no)$/);
   const shouldChangeAddress = addressResponse.match[1] === 'yes';
+
+  if (!shouldChangeAddress) {
+    await ctx.reply(ctx.emoji`Хорошо! Оставим адрес доставки без изменений ${'ok_hand'}`);
+    return;
+  }
+
+  // Delivery address change
   const addressEmoji = ctx.emoji`${'round_pushpin'}`;
-  console.log(`!!!!!!!!!!!!`, addressEmoji, shouldChangeAddress);
-  //
-  // return
-  //
-  // if (!shouldChangeAddress) {
-  //   await ctx.reply(`Хорошо! Адрес ${addressEmoji} останется прежним: ***  ***`, {
-  //     parse_mode: 'MarkdownV2',
-  //   });
-  //   // await ctx.conversation.exit()
-  //   return
-  // }
-  //
-  // await ctx.reply(`Введите новый адрес доставки ${addressEmoji}`, {
-  //   parse_mode: 'MarkdownV2',
-  // });
-  // const { message: userAddress } = await conversation.waitFor(':text');
-  //
-  // console.log(`!!!!!!!!!!!!`, userAddress)
+  await ctx.reply(`***На какой адрес меняем?*** ${addressEmoji}`, {
+    parse_mode: 'MarkdownV2',
+  });
+  const { message: userUpdatedAddress } = await conversation.waitFor(':text');
+  const updatedOrder = await updateOrderDeliveryAddress(order.id, userUpdatedAddress?.text ?? '');
+
+  if (updatedOrder) {
+    await showOrderInfo(ctx, updatedOrder, 'ваш заказ обновлен!');
+  }
 };
