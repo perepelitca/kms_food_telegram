@@ -129,7 +129,6 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
     },
   );
   const commentResponse = await conversation.waitForCallbackQuery('nocomments');
-  console.log(commentResponse.match);
   if (commentResponse.match === 'nocomments') {
     createOrderSession.comments = '';
   } else {
@@ -153,7 +152,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
 
   await ctx.reply(
     `
-<b>${last_name},</b> ваш заказ принят! 🎉
+<b>${first_name},</b> ваш заказ принят! 🎉
 <pre>
 Телефон:          ${phone}
 Адрес:            ${address}
