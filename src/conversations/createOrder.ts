@@ -2,7 +2,7 @@ import { addOrder } from '../db';
 import type { BotConversation, BotContext } from './types';
 import { askForPhoneNumber } from '../helpers/phone';
 import { InlineKeyboard } from 'grammy';
-import { getZonedDate, TimeZone, isTodayBefore9am } from '../helpers/datetime';
+import { getZonedDate, TimeZone, isTodayBeforeTime } from '../helpers/datetime';
 import { addMonths, getDaysInMonth, isBefore } from 'date-fns';
 import { format } from 'date-fns-tz';
 import { showOrderInfo } from '../helpers/showOrderInfo';
@@ -38,7 +38,7 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
     // Skip today if it's after 9am
     if (
       format(dayDate, 'yyyy-MM-dd') === format(currentDate, 'yyyy-MM-dd') &&
-      !isTodayBefore9am(dayDate)
+      !isTodayBeforeTime(dayDate, 9)
     ) {
       continue;
     }

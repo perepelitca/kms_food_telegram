@@ -33,8 +33,8 @@ export const getZonedDate = (date: Date | number = Date.now()): Date => {
   return toZonedTime(date, TimeZone);
 };
 
-// Check if the given date is today and before 9am in the Vladivostok timezone
-export const isTodayBefore9am = (date: Date): boolean => {
+// Check if the given date is today and before the specified time in Vladivostok timezone
+export const isTodayBeforeTime = (date: Date, hour: number, minute: number = 0): boolean => {
   const currentDate = getZonedDate();
   const providedDate = format(date, 'yyyy-MM-dd', { timeZone: TimeZone });
   const todayDate = format(currentDate, 'yyyy-MM-dd', { timeZone: TimeZone });
@@ -43,11 +43,11 @@ export const isTodayBefore9am = (date: Date): boolean => {
     return false; // Not today
   }
 
-  // If it's today, check if the time is before 9 AM
-  const nineAMToday = new Date(currentDate);
-  nineAMToday.setHours(9, 0, 0, 0);
+  // If it's today, check if the time is before the specified hour and minute
+  const specificTimeToday = new Date(currentDate);
+  specificTimeToday.setHours(hour, minute, 0, 0);
 
-  return isBefore(currentDate, nineAMToday);
+  return isBefore(currentDate, specificTimeToday);
 };
 
 /**
