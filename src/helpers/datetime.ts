@@ -1,5 +1,5 @@
 import { format, fromZonedTime, toZonedTime } from 'date-fns-tz';
-import { isBefore } from 'date-fns';
+import { isBefore, isSameDay } from 'date-fns';
 // import { ru } from 'date-fns/locale'
 
 // The timezone of the Far East region of Russia.
@@ -48,4 +48,32 @@ export const isTodayBefore9am = (date: Date): boolean => {
   nineAMToday.setHours(9, 0, 0, 0);
 
   return isBefore(currentDate, nineAMToday);
+};
+
+/**
+ * Check if the order can be modified.
+ * Orders can be modified if the delivery date is not today or if it's before 3 PM.
+ * @param deliveryDate. The delivery date of the order.
+ */
+export const canChangeOrder = (deliveryDate: string): boolean => {
+  // Get the current date and time in the Vladivostok timezone
+  const now = toZonedTime(new Date(), TimeZone);
+
+  // Get the delivery date of the order in the Vladivostok timezone
+  const orderDeliveryDate = toZonedTime(deliveryDate, TimeZone);
+
+  // Check if the delivery date is today
+  const isDeliveryToday = isSameDay(now, orderDeliveryDate);
+
+  // If the delivery date is today, check if it's already past 3 PM
+  if (isDeliveryToday) {
+    const threePMToday = new Date(now);
+    threePMToday.setHours(15, 0, 0, 0); // Set the time to 3 PM
+
+    // If it's past 3 PM today, the order cannot be modified
+    return isBefore(now, threePMToday);
+  }
+
+  // If the delivery date is not today (i.e., it's in the future), the order can still be modified
+  return true;
 };

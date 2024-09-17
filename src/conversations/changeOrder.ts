@@ -3,6 +3,7 @@ import { InlineKeyboard } from 'grammy';
 import { getOrder } from '../helpers/getOrder';
 import { updateOrderDeliveryAddress } from '../db';
 import { showOrderInfo } from '../helpers/showOrderInfo';
+import { canChangeOrder } from '../helpers/datetime';
 
 // Generate a keyboard for changing the delivery address
 export const changeDeliveryAddressPicker = (): InlineKeyboard => {
@@ -40,9 +41,16 @@ export const changeOrder = async (conversation: BotConversation, ctx: BotContext
     parse_mode: 'MarkdownV2',
   });
   const { message: userUpdatedAddress } = await conversation.waitFor(':text');
-  const updatedOrder = await updateOrderDeliveryAddress(order.id, userUpdatedAddress?.text ?? '');
 
-  if (updatedOrder) {
-    await showOrderInfo(ctx, updatedOrder, 'ваш заказ обновлен!');
+  if (canChangeOrder(order.delivery_date)) {
+    const updatedOrder = await updateOrderDeliveryAddress(order.id, userUpdatedAddress?.text ?? '');
+
+    if (updatedOrder) {
+      await showOrderInfo(ctx, updatedOrder, 'ваш заказ обновлен!');
+    }
+  } else {
+    await ctx.reply(
+      ctx.emoji`Извините, но заказ нельзя уже изменить. \n Заказы можно изменять до 15:00 в день доставки. ${'smiling_face_with_tear'}`,
+    );
   }
 };
