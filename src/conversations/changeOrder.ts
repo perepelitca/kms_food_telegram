@@ -34,6 +34,12 @@ export const changeOrder = async (conversation: BotConversation, ctx: BotContext
     await ctx.reply(ctx.emoji`Хорошо! Оставим адрес доставки без изменений ${'ok_hand'}`);
     return;
   }
+  if (!canChangeOrder(order.delivery_date)) {
+    await ctx.reply(
+      ctx.emoji`Извините, но заказ нельзя уже изменить. \nЗаказы можно изменять до 15:00 в день доставки. ${'smiling_face_with_tear'}`,
+    );
+    return;
+  }
 
   // Delivery address change
   const addressEmoji = ctx.emoji`${'round_pushpin'}`;
@@ -41,16 +47,9 @@ export const changeOrder = async (conversation: BotConversation, ctx: BotContext
     parse_mode: 'MarkdownV2',
   });
   const { message: userUpdatedAddress } = await conversation.waitFor(':text');
+  const updatedOrder = await updateOrderDeliveryAddress(order.id, userUpdatedAddress?.text ?? '');
 
-  if (canChangeOrder(order.delivery_date)) {
-    const updatedOrder = await updateOrderDeliveryAddress(order.id, userUpdatedAddress?.text ?? '');
-
-    if (updatedOrder) {
-      await showOrderInfo(ctx, updatedOrder, 'ваш заказ обновлен!');
-    }
-  } else {
-    await ctx.reply(
-      ctx.emoji`Извините, но заказ нельзя уже изменить. \n Заказы можно изменять до 15:00 в день доставки. ${'smiling_face_with_tear'}`,
-    );
+  if (updatedOrder) {
+    await showOrderInfo(ctx, updatedOrder, 'ваш заказ обновлен!');
   }
 };

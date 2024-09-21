@@ -1,4 +1,5 @@
 import type { BotContext, OrderData } from '../conversations/types';
+import { utcToZonedTime } from './datetime';
 
 /**
  * Show order information
@@ -16,7 +17,7 @@ export const showOrderInfo = async (ctx: BotContext, order: OrderData, message: 
 Телефон:          ${phone}
 Адрес:            ${address}
 На сколько дней:  ${duration}
-Дата доставки:    ${delivery_date}
+Дата доставки:    ${utcToZonedTime(delivery_date)}
 Комментарии:      ${comments}
 </pre>
 `,

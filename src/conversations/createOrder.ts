@@ -2,7 +2,13 @@ import { addOrder } from '../db';
 import type { BotConversation, BotContext } from './types';
 import { askForPhoneNumber } from '../helpers/phone';
 import { InlineKeyboard } from 'grammy';
-import { getZonedDate, TimeZone, isTodayBeforeTime } from '../helpers/datetime';
+import {
+  getZonedDate,
+  TimeZone,
+  isTodayBeforeTime,
+  dateStringToUtcIso,
+  dayFormat,
+} from '../helpers/datetime';
 import { addMonths, getDaysInMonth, isBefore } from 'date-fns';
 import { format } from 'date-fns-tz';
 import { showOrderInfo } from '../helpers/showOrderInfo';
@@ -37,14 +43,14 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
 
     // Skip today if it's after 9am
     if (
-      format(dayDate, 'yyyy-MM-dd') === format(currentDate, 'yyyy-MM-dd') &&
+      format(dayDate, dayFormat) === format(currentDate, dayFormat) &&
       !isTodayBeforeTime(dayDate, 9)
     ) {
       continue;
     }
 
     const dayLabel = format(dayDate, 'd');
-    keyboard.text(dayLabel, `select_day:${format(dayDate, 'dd-MM-yyyy')}`);
+    keyboard.text(dayLabel, `select_day:${format(dayDate, dayFormat)}`);
 
     if (day % 7 === 0) {
       keyboard.row(); // Add a new row after 7 days
@@ -95,11 +101,11 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
     reply_markup: createDayPicker(selectedMonth),
     parse_mode: 'MarkdownV2',
   });
-  const dayResponse = await conversation.waitForCallbackQuery(/^select_day:(\d{2}-\d{2}-\d{4})$/, {
+  const dayResponse = await conversation.waitForCallbackQuery(/^select_day:(\d{4}-\d{2}-\d{2})$/, {
     otherwise: (ctx) =>
       ctx.reply('Выберите дату!', { reply_markup: createDayPicker(selectedMonth) }),
   });
-  createOrderSession.delivery_date = dayResponse.match[1] ?? '';
+  createOrderSession.delivery_date = dateStringToUtcIso(dayResponse.match[1] ?? '');
 
   // First name
   const firstNameEmoji = ctx.emoji`${'person_raising_hand'}`;
