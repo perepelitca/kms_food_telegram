@@ -58,14 +58,12 @@ export const generateExcelFromQuery = async (filePath: string): Promise<boolean>
         if (dateFieldsWithTime.includes(key)) {
           // Print dates in a format 'P HH:mm' (e.g. '2024-09-27T15:00:00.000' -> '09/27/2024 15:00')
           formattedRow[headerKey] = utcToZonedTime(value as string, 'P HH:mm');
-        }
-
-        if (dateFields.includes(key)) {
+        } else if (dateFields.includes(key)) {
           // Print dates in a format 'P HH:mm' (e.g. '2024-09-27T15:00:00.000' -> 'Sep 27, 2024')
           formattedRow[headerKey] = utcToZonedTime(value as string, 'PP');
+        } else {
+          formattedRow[headerKey] = value;
         }
-
-        formattedRow[headerKey] = value;
       }
     }
     return formattedRow;
@@ -89,7 +87,6 @@ export const generateExcelFromQuery = async (filePath: string): Promise<boolean>
     }
   });
 
-  console.log('worksheet', JSON.stringify(worksheet, null, 2));
   // Set width to 20 for all columns
   worksheet['!cols'] = Object.keys(headerMapping).map(() => ({ wch: 20 }));
 

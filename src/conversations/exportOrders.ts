@@ -4,6 +4,7 @@ import type { BotConversation, BotContext } from './types';
 import { generateExcelFromQuery } from '../helpers/export';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
+import { dateToUtcIso, getZonedDate, utcToZonedTime } from '../helpers/datetime';
 
 /**
  * Export orders to Excel file. Only admin users can export orders.
@@ -32,10 +33,10 @@ export const exportOrders = async (conversation: BotConversation, ctx: BotContex
     }
   }
 
-  await ctx.reply(ctx.emoji`${'check_mark_button'} Loading orders...`);
+  await ctx.reply(ctx.emoji`${'check_mark_button'} Ищем заказы на сегодня...`);
 
   try {
-    const filename = 'exported_messages.xlsx';
+    const filename = `${utcToZonedTime(dateToUtcIso(), 'P')} Заказы.xlsx`;
     // Define the file path where the Excel file will be saved
     const filePath = `./${filename}`;
     // Generate the Excel file
