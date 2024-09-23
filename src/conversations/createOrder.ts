@@ -13,6 +13,8 @@ import { addMonths, getDaysInMonth, isBefore } from 'date-fns';
 import { format } from 'date-fns-tz';
 import { showOrderInfo } from '../helpers/showOrderInfo';
 
+const commentEmptyValues = [' ', '-', 'нет', '_'];
+
 // Generate a keyboard for the user to select a month
 export const createMonthPicker = (): InlineKeyboard => {
   const currentDate = getZonedDate();
@@ -61,8 +63,8 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
 };
 
 // Generate a keyboard for the user to select if they have comments
-export const commentPicker = (): InlineKeyboard =>
-  new InlineKeyboard().text('Нет комментариев', 'nocomments');
+// export const commentPicker = (): InlineKeyboard =>
+//   new InlineKeyboard().text('Нет комментариев', 'nocomments');
 
 // Create order conversation where user enters their order details
 export const createOrder = async (conversation: BotConversation, ctx: BotContext) => {
@@ -136,20 +138,30 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
 
   // Order comments (if any)
   const commentEmoji = ctx.emoji`${'scroll'}`;
+  // TODO. How to skip commentPicker conversation when user didn't hit any button?
+  // await ctx.reply(
+  //   `***Укажите комментарий к заказу \\(аллергии, предпочтения и т\\.д\\.\\)*** ${commentEmoji} \n _Если нет комментариев, просто нажмите кнопку_`,
+  //   {
+  //     reply_markup: commentPicker(),
+  //     parse_mode: 'MarkdownV2',
+  //   },
+  // );
+  // const commentResponse = await conversation.waitForCallbackQuery('nocomments');
+  // if (commentResponse.match === 'nocomments') {
+  //   createOrderSession.comments = '';
+  // } else {
+  //   const { message: userComments } = await conversation.waitFor(':text');
+  //   createOrderSession.comments = userComments?.text;
+  // }
   await ctx.reply(
-    `***Укажите комментарий к заказу \\(аллергии, предпочтения и т\\.д\\.\\)*** ${commentEmoji} \n _Если нет комментариев, просто нажмите кнопку_`,
+    `***Укажите комментарий к заказу \\(аллергии, предпочтения и т\\.д\\.\\)*** ${commentEmoji} \n _Если нет комментариев, напишите Нет или поставьте прочерк_`,
     {
-      reply_markup: commentPicker(),
       parse_mode: 'MarkdownV2',
     },
   );
-  const commentResponse = await conversation.waitForCallbackQuery('nocomments');
-  if (commentResponse.match === 'nocomments') {
-    createOrderSession.comments = '';
-  } else {
-    const { message: userComments } = await conversation.waitFor(':text');
-    createOrderSession.comments = userComments?.text;
-  }
+  const { message } = await conversation.waitFor(':text');
+  const userComments = message?.text ?? '';
+  createOrderSession.comments = commentEmptyValues.includes(userComments) ? '' : userComments;
 
   const { first_name, last_name, phone, address, duration, comments, delivery_date } =
     createOrderSession;

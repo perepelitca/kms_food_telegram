@@ -54,15 +54,18 @@ export const generateExcelFromQuery = async (filePath: string): Promise<boolean>
     for (const [key, value] of Object.entries(row)) {
       if (key in headerMapping) {
         const headerKey = headerMapping[key as keyof typeof headerMapping];
+
         if (dateFieldsWithTime.includes(key)) {
           // Print dates in a format 'P HH:mm' (e.g. '2024-09-27T15:00:00.000' -> '09/27/2024 15:00')
           formattedRow[headerKey] = utcToZonedTime(value as string, 'P HH:mm');
-        } else if (dateFields.includes(key)) {
+        }
+
+        if (dateFields.includes(key)) {
           // Print dates in a format 'P HH:mm' (e.g. '2024-09-27T15:00:00.000' -> 'Sep 27, 2024')
           formattedRow[headerKey] = utcToZonedTime(value as string, 'PP');
-        } else {
-          formattedRow[headerKey] = value;
         }
+
+        formattedRow[headerKey] = value;
       }
     }
     return formattedRow;
