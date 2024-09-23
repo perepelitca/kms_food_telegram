@@ -102,18 +102,6 @@ export type Order = Omit<DbOrder, 'order_date' | 'id' | 'last_updated'>;
 export type Admin = Pick<DbOrder, 'user_id'>;
 
 /**
- * Get orders from the last N days
- * @param days. The number of days to look back
- */
-export const getOrdersFromLastNDays = async (days: number): Promise<Array<DbOrder>> => {
-  const db = await dbPromise();
-  return await db.all<Array<DbOrder>>(
-    `SELECT * FROM orders WHERE order_date >= datetime('now', ?)`,
-    [`-${days} days`],
-  );
-};
-
-/**
  * Insert a new message into the database
  * @param order. The order to insert
  */
@@ -157,9 +145,6 @@ export const addOrder = async ({
 export const addAdmin = async (admin_id: string): Promise<void> => {
   const db = await dbPromise();
   await db.run('INSERT OR IGNORE INTO admins (admin_id) VALUES (?);', [admin_id]);
-
-  // After inserting, check if we need to trim old records
-  // await maintainMaxRecords();
 };
 
 /**
@@ -181,30 +166,6 @@ export const isAdmin = async (admin_id: Admin['user_id']): Promise<boolean> => {
     admin_id,
   ]);
   return Boolean(admin);
-};
-
-/**
- * Find an order by the last name and phone number
- * @param lastName. The last name of the person who placed the order
- * @param phone. The phone number of the person who placed the order
- */
-export const findOrderByNameAndPhone = async (
-  lastName: string,
-  phone: string,
-): Promise<Order | null> => {
-  const db = await dbPromise();
-  const currentUtcIso = dateToUtcIso();
-
-  const order = await db.get<DbOrder>(
-    `
-    SELECT * FROM orders
-    WHERE last_name = ? AND phone = ? AND order_date > ?
-    ORDER BY order_date ASC
-  `,
-    [lastName, phone, currentUtcIso],
-  );
-
-  return order ?? null;
 };
 
 /**
@@ -297,3 +258,41 @@ export const dropOrders = async (): Promise<void> => {
 //     `, [recordsToDelete]);
 //     }
 // }
+
+// /**
+//  * Find an order by the last name and phone number
+//  * @param lastName. The last name of the person who placed the order
+//  * @param phone. The phone number of the person who placed the order
+//  */
+// export const findOrderByNameAndPhone = async (
+//   lastName: string,
+//   phone: string,
+// ): Promise<Order | null> => {
+//   const db = await dbPromise();
+//   const currentUtcIso = dateToUtcIso();
+//
+//   const order = await db.get<DbOrder>(
+//     `
+//     SELECT * FROM orders
+//     WHERE last_name = ? AND phone = ? AND order_date > ?
+//     ORDER BY order_date ASC
+//   `,
+//     [lastName, phone, currentUtcIso],
+//   );
+//
+//   return order ?? null;
+// };
+//
+//
+//
+// /**
+//  * Get orders from the last N days
+//  * @param days. The number of days to look back
+//  */
+// export const getOrdersFromLastNDays = async (days: number): Promise<Array<DbOrder>> => {
+//   const db = await dbPromise();
+//   return await db.all<Array<DbOrder>>(
+//     `SELECT * FROM orders WHERE order_date >= datetime('now', ?)`,
+//     [`-${days} days`],
+//   );
+// };
