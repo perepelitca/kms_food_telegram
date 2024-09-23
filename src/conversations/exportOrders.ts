@@ -4,7 +4,7 @@ import type { BotConversation, BotContext } from './types';
 import { generateExcelFromQuery } from '../helpers/export';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
-import { dateToUtcIso, getZonedDate, utcToZonedTime } from '../helpers/datetime';
+import { dateToUtcIso, utcToZonedTime } from '../helpers/datetime';
 
 /**
  * Export orders to Excel file. Only admin users can export orders.
