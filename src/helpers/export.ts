@@ -1,9 +1,11 @@
 import xlsx from 'xlsx';
-import { dbPromise } from '../db';
+import { dbPromise, DbOrder } from '../db';
 import { utcToZonedTime } from './datetime';
 
+type ExcelRow = Omit<DbOrder, 'user_id' | 'id'>;
+
 // Custom header mapping
-const headerMapping = {
+const headerMapping: Record<keyof ExcelRow, string> = {
   first_name: 'Имя',
   last_name: 'Фaмилия',
   delivery_date: 'Дата доставки',
@@ -40,11 +42,11 @@ export const generateExcelFromQuery = async (filePath: string) => {
   AND delivery_date < datetime('now', 'start of day', '+34 hours')
   ORDER BY last_updated ASC`;
 
-  const rows = await db.all(query);
+  const rows = await db.all<Array<DbOrder>>(query);
 
   // Format and rename fields
   const formattedRows = rows.map((row) => {
-    const formattedRow: { [key: string]: any } = {};
+    const formattedRow: { [key: string]: string } = {};
     for (const [key, value] of Object.entries(row)) {
       if (key in headerMapping) {
         const headerKey = headerMapping[key as keyof typeof headerMapping];
