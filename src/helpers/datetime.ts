@@ -1,5 +1,5 @@
 import { format, toZonedTime } from 'date-fns-tz';
-import { isBefore, isSameDay, parse, startOfDay, parseISO } from 'date-fns';
+import { isBefore, isSameDay, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 // The timezone of the Far East region of Russia.
@@ -47,23 +47,11 @@ export const getZonedDate = (date: Date | number = Date.now()): Date => {
 };
 
 /**
- * Convert a date string to the start of the day in the UTC timezone.
- * @param date. The date string to convert.
- * @param dateFormat. The format of the date string.
+ * Check if the given date is today and before the specified time.
+ * @param date. The date to check.
+ * @param hour. The hour to check.
+ * @param minute. The minute to check. Defaults to 0.
  */
-export const dateToUtcStartOfDay = (date: string, dateFormat: string): string => {
-  // Parse the input string to a Date object
-  const parsedDate = parse(date, dateFormat, new Date());
-
-  // Get the start of the day for the parsed date
-  const startOfDayDate = startOfDay(parsedDate);
-
-  // Convert to UTC ISO string using the existing utility
-  return format(startOfDayDate, "yyyy-MM-dd'T'00:00:00.000xxx");
-  // return dateToUtcIso(startOfDayDate);
-};
-
-// Check if the given date is today and before the specified time in Vladivostok timezone
 export const isTodayBeforeTime = (date: Date, hour: number, minute: number = 0): boolean => {
   const currentDate = getZonedDate();
   const providedDate = format(date, dayFormat, { timeZone: TimeZone });

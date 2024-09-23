@@ -33,13 +33,18 @@ export const exportOrders = async (conversation: BotConversation, ctx: BotContex
   }
 
   await ctx.reply(ctx.emoji`${'check_mark_button'} Loading orders...`);
-  const filename = 'exported_messages.xlsx';
-  // Define the file path where the Excel file will be saved
-  const filePath = `./${filename}`;
 
   try {
+    const filename = 'exported_messages.xlsx';
+    // Define the file path where the Excel file will be saved
+    const filePath = `./${filename}`;
     // Generate the Excel file
-    await generateExcelFromQuery(filePath);
+    const hasOrdersForToday = await generateExcelFromQuery(filePath);
+
+    if (!hasOrdersForToday) {
+      await ctx.reply(ctx.emoji`${'face_with_monocle'} На сегодня нет заказов...`);
+      return;
+    }
 
     // Create a Readable stream from the file
     const fileStream = fs.createReadStream(filePath);

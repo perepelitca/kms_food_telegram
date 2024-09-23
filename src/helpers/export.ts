@@ -16,16 +16,16 @@ const headerMapping: Record<keyof ExcelRow, string> = {
   phone: 'Телефон',
   address: 'Адрес доставки',
 };
-const dateFields = ['delivery_date', 'order_date', 'last_updated'];
 
-// const query = `
-//   SELECT * FROM orders
-//   WHERE date(delivery_date) = date(CURRENT_TIMESTAMP, '+10 hours')
-//   ORDER BY last_updated ASC
-// `;
+const dateFieldsWithTime = ['last_updated', 'order_date'];
+const dateFields = ['delivery_date'];
 
-// Function to generate Excel file from SQL query result
-export const generateExcelFromQuery = async (filePath: string) => {
+/**
+ * Generate an Excel file from the orders where the delivery date is today.
+ * @param filePath. The path where the Excel file will be saved.
+ * @returns boolean. True if there are orders for today, false otherwise.
+ */
+export const generateExcelFromQuery = async (filePath: string): Promise<boolean> => {
   const db = await dbPromise();
 
   /**
@@ -35,8 +35,8 @@ export const generateExcelFromQuery = async (filePath: string) => {
    * 'start of day' + 34 hours: beginning of the next day in Vladivostok
    */
   const query = `
-  SELECT first_name, last_name, delivery_date, order_date, last_updated, 
-         duration, comments, phone, address 
+  SELECT first_name, last_name, phone, address, delivery_date, 
+        order_date, last_updated, duration, comments 
   FROM orders
   WHERE delivery_date >= datetime('now', 'start of day', '+10 hours')
   AND delivery_date < datetime('now', 'start of day', '+34 hours')
@@ -44,14 +44,22 @@ export const generateExcelFromQuery = async (filePath: string) => {
 
   const rows = await db.all<Array<DbOrder>>(query);
 
+  if (rows.length === 0) {
+    return false;
+  }
+
   // Format and rename fields
   const formattedRows = rows.map((row) => {
     const formattedRow: { [key: string]: string } = {};
     for (const [key, value] of Object.entries(row)) {
       if (key in headerMapping) {
         const headerKey = headerMapping[key as keyof typeof headerMapping];
-        if (dateFields.includes(key)) {
-          formattedRow[headerKey] = utcToZonedTime(value as string, 'PP pp');
+        if (dateFieldsWithTime.includes(key)) {
+          // Print dates in a format 'P HH:mm' (e.g. '2024-09-27T15:00:00.000' -> '09/27/2024 15:00')
+          formattedRow[headerKey] = utcToZonedTime(value as string, 'P HH:mm');
+        } else if (dateFields.includes(key)) {
+          // Print dates in a format 'P HH:mm' (e.g. '2024-09-27T15:00:00.000' -> 'Sep 27, 2024')
+          formattedRow[headerKey] = utcToZonedTime(value as string, 'PP');
         } else {
           formattedRow[headerKey] = value;
         }
@@ -88,4 +96,6 @@ export const generateExcelFromQuery = async (filePath: string) => {
 
   // Write the workbook to a file
   xlsx.writeFile(workbook, filePath);
+
+  return true;
 };
