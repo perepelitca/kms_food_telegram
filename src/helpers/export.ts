@@ -23,11 +23,16 @@ const dateFields = ['delivery_date'];
 /**
  * Generate an Excel file from the orders where the delivery date is today.
  * @param filePath. The path where the Excel file will be saved.
+ * @param dayAddition. The number of days to add to the current date.
  * @returns boolean. True if there are orders for today, false otherwise.
  */
-export const generateExcelFromQuery = async (filePath: string): Promise<boolean> => {
+export const generateExcelFromQuery = async (
+  filePath: string,
+  dayAddition: number = 0,
+): Promise<boolean> => {
   const db = await dbPromise();
 
+  const endDay = dayAddition + 1;
   /**
    * Select orders where delivery date is today and order them by last_updated
    * Vladivostok is consistently UTC+10 (no daylight saving time)
@@ -38,8 +43,8 @@ export const generateExcelFromQuery = async (filePath: string): Promise<boolean>
   SELECT first_name, last_name, phone, address, delivery_date, 
         order_date, last_updated, duration, comments 
   FROM orders
-  WHERE delivery_date >= datetime('now', 'utc', '+10 hours', 'start of day')
-  AND delivery_date < datetime('now', 'utc', '+10 hours', 'start of day', '+1 day')
+  WHERE delivery_date >= datetime('now', 'utc', '+10 hours', 'start of day', '+${dayAddition} day')
+  AND delivery_date < datetime('now', 'utc', '+10 hours', 'start of day', '+${endDay} day')
   ORDER BY last_updated ASC`;
 
   const rows = await db.all<Array<DbOrder>>(query);
