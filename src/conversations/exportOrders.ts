@@ -24,10 +24,16 @@ type AdditionDay = 'today' | 'tomorrow' | 'afterTomorrow';
 /**
  * How many days to add to the current date to get the selected day when to export orders
  */
-const additionDayMap: Record<AdditionDay, number> = {
-  today: 0,
-  tomorrow: 1,
-  afterTomorrow: 2,
+const additionDayMap: Record<
+  AdditionDay,
+  {
+    addDay: number;
+    dayLabel: string;
+  }
+> = {
+  today: { addDay: 0, dayLabel: 'сегодня' },
+  tomorrow: { addDay: 1, dayLabel: 'завтра' },
+  afterTomorrow: { addDay: 2, dayLabel: 'послезавтра' },
 };
 const additionDays: Array<AdditionDay> = ['today', 'tomorrow', 'afterTomorrow'];
 const additionDayPattern = additionDays.map((day) => `export:${day}`).join('|');
@@ -69,20 +75,20 @@ export const exportOrders = async (conversation: BotConversation, ctx: BotContex
       otherwise: (ctx) => ctx.reply('Выберите день!', { reply_markup: createExportPicker() }),
     },
   );
-  const additionDay = additionDayMap[exportResponse.match[1]?.split(':')?.[1] as AdditionDay] ?? 0;
-  console.log('additionDay', additionDay);
+  const exportDay = (exportResponse.match[1]?.split(':')?.[1] as AdditionDay) ?? 'today';
+  const { addDay, dayLabel } = additionDayMap[exportDay];
 
-  await ctx.reply(ctx.emoji`${'check_mark_button'} Ищем заказы на сегодня...`);
+  await ctx.reply(ctx.emoji`${'check_mark_button'} Ищем заказы на ${dayLabel}...`);
 
   try {
-    const filename = `${utcToZonedTime(dateToUtcIso(addDays(new Date(), additionDay)), 'P')} Заказы.xlsx`;
+    const filename = `${utcToZonedTime(dateToUtcIso(addDays(new Date(), addDay)), 'P')} Заказы.xlsx`;
     // Define the file path where the Excel file will be saved
     const filePath = `./${filename}`;
     // Generate the Excel file
-    const hasOrdersForToday = await generateExcelFromQuery(filePath, additionDay);
+    const hasOrdersForToday = await generateExcelFromQuery(filePath, addDay);
 
     if (!hasOrdersForToday) {
-      await ctx.reply(ctx.emoji`${'face_with_monocle'} На сегодня нет заказов...`);
+      await ctx.reply(ctx.emoji`${'face_with_monocle'} На ${dayLabel} нет заказов...`);
       return;
     }
 
