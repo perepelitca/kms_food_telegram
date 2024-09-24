@@ -1,11 +1,10 @@
 #!/bin/bash
 
-# Define variables
 USER=admin        # Server SSH username
 SERVER_IP=51.250.37.216
 PROJECT_DIR=/home/admin/kms_food_telegram   # The path to the project on the server
 BRANCH=main     # The branch you want to pull from
-PROCESS_NAME=kms_food_telegram  # The name of the app in PM2
+PROCESS_NAME=tbot  # The name of the app in PM2
 
 # Pull latest code and build the project with environment variables from local .env
 ssh $USER@$SERVER_IP << 'EOF'
@@ -21,7 +20,7 @@ ssh $USER@$SERVER_IP << 'EOF'
   $(cat .env | xargs) npm run build
 
   echo "Restarting the Node..."
-  pm2 restart $PROCESS_NAME
+  pm2 reload $PROCESS_NAME
 
   echo "Deployment completed!"
 EOF
