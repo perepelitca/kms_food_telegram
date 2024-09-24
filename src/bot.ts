@@ -30,8 +30,8 @@ bot.use(orderMenu);
 bot.api.setMyCommands([
   { command: 'start', description: 'Заказы 🛍️' },
   { command: 'export', description: 'Скачать xls файл 💾' },
-  { command: 'drop_admins', description: 'Delete admins' },
-  { command: 'drop_orders', description: 'Delete orders' },
+  // { command: 'drop_admins', description: 'Delete admins' },
+  // { command: 'drop_orders', description: 'Delete orders' },
 ]);
 
 bot.command('start', async (ctx) => {
