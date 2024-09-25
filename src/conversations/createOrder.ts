@@ -68,7 +68,7 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
 
 // Create order conversation where user enters their order details
 export const createOrder = async (conversation: BotConversation, ctx: BotContext) => {
-  await ctx.reply(ctx.emoji`Начем заказ! ${'handshake_light_skin_tone_no_skin_tone'}`);
+  await ctx.reply(ctx.emoji`Начнем заказ! ${'handshake_light_skin_tone_no_skin_tone'}`);
   const createOrderSession = conversation.session.createOrder;
 
   // Duration of the order

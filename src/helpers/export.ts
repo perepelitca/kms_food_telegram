@@ -8,7 +8,7 @@ type ExcelRow = Omit<DbOrder, 'user_id' | 'id'>;
 const headerMapping: Record<keyof ExcelRow, string> = {
   first_name: 'Имя',
   last_name: 'Фaмилия',
-  delivery_date: 'Дата доставки',
+  delivery_date: 'Дата начала доставки',
   order_date: 'Дата заказа',
   last_updated: 'Последнее обновление',
   duration: 'Количество дней',
