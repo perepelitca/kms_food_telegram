@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "ncc build src/bot.ts -o dist/ --minify",
+    "deploy": "scripts/deploy.sh",
     "dev": "npx ts-node-dev --respawn --transpile-only src/bot.ts",
     "prepare": "husky"
   },

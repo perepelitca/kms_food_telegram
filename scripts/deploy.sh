@@ -1,26 +1,41 @@
 #!/bin/bash
 
-USER=admin        # Server SSH username
-SERVER_IP=51.250.37.216
-PROJECT_DIR=/home/admin/kms_food_telegram   # The path to the project on the server
-BRANCH=main     # The branch you want to pull from
-PROCESS_NAME=tbot  # The name of the app in PM2
+SERVER_USER="admin"
+SERVER_IP="51.250.37.216"
+SSH_KEY="./ignore/private" # path to your private SSH key
+PROJECT_DIR="/home/admin/kms_food_telegram" # path to the project folder on the server
 
-# Pull latest code and build the project with environment variables from local .env
-ssh $USER@$SERVER_IP << 'EOF'
-  cd $PROJECT_DIR
-  echo "Pulling latest code from $BRANCH..."
-  git fetch origin $BRANCH
-  git reset --hard origin/$BRANCH
+# Set your environment variables by reading them from the local .env file
+export $(grep -v '^#' .env | xargs) # Load .env file into environment variables
 
-  echo "Installing dependencies..."
-  npm install
+# Connect to the server and run deployment commands, passing the local environment variables
+ssh -i $SSH_KEY $SERVER_USER@$SERVER_IP << 'EOF'
 
-  echo "Building the project..."
-  $(cat .env | xargs) npm run build
+# Navigate to the project directory
+cd $PROJECT_DIR
 
-  echo "Restarting the Node..."
-  pm2 reload $PROCESS_NAME
+# Reset the current state and pull the latest changes
+echo "Pulling latest code from $BRANCH..."
+git reset --hard HEAD
+git pull origin main
 
-  echo "Deployment completed!"
+# Export environment variables received from the local machine
+export TELEGRAM_TOKEN='$TELEGRAM_TOKEN'
+export PASSWORD_HASH='$PASSWORD_HASH'
+export DB_PATH='$DB_PATH'
+
+# Install dependencies
+echo "Installing dependencies..."
+npm install
+
+# Build the project with the environment variables
+echo "Building the project..."
+npm run build
+
+# Reload pm2 to restart the bot
+echo "Restarting the Node..."
+pm2 reload tbot
+
+echo "Deployment completed!"
+
 EOF
