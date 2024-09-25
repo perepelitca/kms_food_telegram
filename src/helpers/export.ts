@@ -32,19 +32,28 @@ export const generateExcelFromQuery = async (
 ): Promise<boolean> => {
   const db = await dbPromise();
 
-  const endDay = dayAddition + 1;
   /**
    * Select orders where delivery date is today and order them by last_updated
    * Vladivostok is consistently UTC+10 (no daylight saving time)
-   * 'start of day' + 10 hours: beginning of the current day in Vladivostok
-   * 'start of day' + 1 day: beginning of the next day in Vladivostok
+   * Start on the target date (today, tomorrow, or day after tomorrow, based on dayAddition),
+   * OR
+   * Started before the target date but are still active on the target date due to their duration.
    */
   const query = `
   SELECT first_name, last_name, phone, address, delivery_date, 
-        order_date, last_updated, duration, comments 
+         order_date, last_updated, duration, comments 
   FROM orders
-  WHERE delivery_date >= datetime('now', 'utc', '+10 hours', 'start of day', '+${dayAddition} day')
-  AND delivery_date < datetime('now', 'utc', '+10 hours', 'start of day', '+${endDay} day')
+  WHERE (
+  -- Check if the delivery date falls on the target date
+  date(delivery_date) = date('now', 'utc', '+10 hours', 'start of day', '+' || ${dayAddition} || ' day')
+  OR
+  -- Check if the target date falls within the duration of the order
+  (
+    date(delivery_date) <= date('now', 'utc', '+10 hours', 'start of day', '+' || ${dayAddition} || ' day')
+    AND
+    date(delivery_date, '+' || (duration - 1) || ' day') >= date('now', 'utc', '+10 hours', 'start of day', '+' || ${dayAddition} || ' day')
+  )
+)
   ORDER BY last_updated ASC`;
 
   const rows = await db.all<Array<DbOrder>>(query);
