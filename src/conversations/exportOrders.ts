@@ -48,6 +48,8 @@ export const exportOrders = async (conversation: BotConversation, ctx: BotContex
   if (!isAdminUser) {
     await ctx.reply(ctx.emoji`${'locked'} Введите пароль администратора`);
     const { message: password, msgId } = await conversation.waitFor(':text', {});
+    console.log('PASSWORD_HASH', process.env.PASSWORD_HASH);
+    console.log('text', password?.text);
     const match = await bcrypt.compare(password?.text ?? '', process.env.PASSWORD_HASH as string);
 
     if (!match) {
