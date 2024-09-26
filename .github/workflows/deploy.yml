@@ -54,5 +54,5 @@ jobs:
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_IP "
             cd $PROJECT_DIR &&
-            TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }} PASSWORD_HASH=${{ secrets.PASSWORD_HASH }} DB_PATH=${{ secrets.DB_PATH }} pm2 reload tbot
+            pm2 restart tbot --env TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }} --env PASSWORD_HASH=${{ secrets.PASSWORD_HASH }} --env DB_PATH=${{ secrets.DB_PATH }}
           "
