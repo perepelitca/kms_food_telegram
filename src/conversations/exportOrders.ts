@@ -80,7 +80,8 @@ export const exportOrders = async (conversation: BotConversation, ctx: BotContex
 
   console.log('exportResponse', exportResponse.match[1]);
 
-  const exportDay = (exportResponse.match[1]?.split(':')?.[1] as AdditionDay) ?? 'today';
+  const exportDay: AdditionDay =
+    (exportResponse.match[1]?.split(':')?.[1] as AdditionDay) ?? 'today';
   const { addDay, dayLabel } = additionDayMap[exportDay];
 
   await ctx.reply(ctx.emoji`${'check_mark_button'} Ищем заказы на ${dayLabel}...`);
