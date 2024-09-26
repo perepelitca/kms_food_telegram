@@ -2,11 +2,19 @@
 
 SERVER_USER="admin"
 SERVER_IP="51.250.37.216"
-SSH_KEY="./ignore/private" # path to your private SSH key
+SSH_KEY="./ignore/server/private" # path to your private SSH key
 PROJECT_DIR="/home/admin/kms_food_telegram" # path to the project folder on the server
 
 # Set your environment variables by reading them from the local .env file
-export $(grep -v '^#' .env | xargs) # Load .env file into environment variables
+#export $(grep -v '^#' .env | xargs) # Load .env file into environment variables
+
+# Load environment variables from the .env file into the current shell
+while IFS='=' read -r key value; do
+    # Ignore lines starting with '#'
+    if [[ $key != \#* ]]; then
+        export "$key=$value"
+    fi
+done < .env
 
 # Connect to the server and run deployment commands, passing the local environment variables
 ssh -i $SSH_KEY $SERVER_USER@$SERVER_IP << 'EOF'
