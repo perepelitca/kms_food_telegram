@@ -46,13 +46,13 @@ jobs:
           sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no -r dist/ $SERVER_USER@$SERVER_IP:/root/telegram_bot/
 
       # Restart PM2 on the server
-      # - name: Restart bot with PM2
-      #   env:
-      #     SERVER_IP: ${{ secrets.SERVER_IP }}
-      #     SERVER_USER: ${{ secrets.SERVER_USER }}
-      #     SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
-      #   run: |
-      #     sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP << EOF
-      #       cd /root/telegram_bot/
-      #       pm2 reload tbot
-      #     EOF
+      - name: Reload bot on the server using pm2
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP << EOF
+            cd /root/telegram_bot/
+            pm2 reload tbot
+          EOF
