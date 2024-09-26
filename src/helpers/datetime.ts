@@ -5,7 +5,7 @@ import { ru } from 'date-fns/locale';
 // The timezone of the Far East region of Russia.
 export const TimeZone = 'Asia/Vladivostok';
 
-// The default date format used in the app
+// The default date format used in the app.
 export const dayFormat = 'yyyy-MM-dd';
 
 /**
