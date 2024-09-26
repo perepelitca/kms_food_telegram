@@ -52,7 +52,7 @@ jobs:
           SERVER_USER: ${{ secrets.SERVER_USER }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_IP"
+          sshpass -p "$SERVER_PASSWORD" ssh $SERVER_USER@$SERVER_IP "
             cd $PROJECT_DIR &&
             TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }} PASSWORD_HASH=${{ secrets.PASSWORD_HASH }} DB_PATH=${{ secrets.DB_PATH }} pm2 reload tbot
           "
