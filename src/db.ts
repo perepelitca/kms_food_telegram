@@ -6,7 +6,6 @@ let dbInstance: Database | null = null;
 
 // Open a SQLite database
 export const dbPromise = async (): Promise<Database> => {
-  console.log('path:', process.env.DB_PATH);
   if (!dbInstance) {
     try {
       dbInstance = await open({

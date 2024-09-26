@@ -32,9 +32,6 @@ export const generateExcelFromQuery = async (
 ): Promise<boolean> => {
   const db = await dbPromise();
 
-  const orders = await db.all(`SELECT * FROM orders`);
-  console.log('orders:', orders);
-
   /**
    * Select orders where delivery date is today and order them by last_updated
    * Vladivostok is consistently UTC+10 (no daylight saving time)
@@ -60,7 +57,7 @@ export const generateExcelFromQuery = async (
   ORDER BY last_updated ASC`;
 
   const rows = await db.all<Array<DbOrder>>(query);
-  console.log('rows:', rows);
+  console.log('rows:', rows.length);
 
   if (rows.length === 0) {
     return false;
