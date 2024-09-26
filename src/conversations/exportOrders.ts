@@ -77,6 +77,9 @@ export const exportOrders = async (conversation: BotConversation, ctx: BotContex
       otherwise: (ctx) => ctx.reply('Выберите день!', { reply_markup: createExportPicker() }),
     },
   );
+
+  console.log('exportResponse', exportResponse.match[1]);
+
   const exportDay = (exportResponse.match[1]?.split(':')?.[1] as AdditionDay) ?? 'today';
   const { addDay, dayLabel } = additionDayMap[exportDay];
 

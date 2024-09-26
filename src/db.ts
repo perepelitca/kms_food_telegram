@@ -7,10 +7,15 @@ let dbInstance: Database | null = null;
 // Open a SQLite database
 export const dbPromise = async (): Promise<Database> => {
   if (!dbInstance) {
-    dbInstance = await open({
-      filename: `${process.env.DB_PATH}`,
-      driver: sqlite3.Database,
-    });
+    try {
+      dbInstance = await open({
+        filename: `${process.env.DB_PATH}`,
+        driver: sqlite3.Database,
+      });
+    } catch (error) {
+      console.error('Error opening the database', error);
+      throw error;
+    }
   }
   return dbInstance;
 };
