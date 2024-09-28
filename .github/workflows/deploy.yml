@@ -36,6 +36,10 @@ jobs:
       - name: Install sshpass
         run: sudo apt-get install -y sshpass
 
+      # Install rsync
+      - name: Install rsync
+        run: sudo apt-get install -y rsync
+
       # Copy built files to the server using scp and sshpass
       - name: Transfer built files via SSH
         env:
@@ -43,7 +47,7 @@ jobs:
           SERVER_USER: ${{ secrets.SERVER_USER }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
         run: |
-          sshpass -p "$SERVER_PASSWORD" scp -o StrictHostKeyChecking=no -r dist/ $SERVER_USER@$SERVER_IP:/root/telegram_bot/
+          sshpass -p "$SERVER_PASSWORD" rsync -avz --exclude 'sessions' -e "ssh -o StrictHostKeyChecking=no" dist/ $SERVER_USER@$SERVER_IP:/root/telegram_bot/
 
       # Restart PM2 on the server
       - name: Reload bot on the server using pm2
