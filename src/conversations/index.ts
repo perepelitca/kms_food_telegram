@@ -5,13 +5,25 @@ import { exportOrders } from './exportOrders';
 import { showOrders } from './showOrders';
 import { conversations, createConversation } from '@grammyjs/conversations';
 import type { BotContext, OrderData } from './types';
+import { FileAdapter } from '@grammyjs/storage-file';
 
 export enum ConversationSession {
   CreateOrder = 'createOrder',
   ChangeOrder = 'changeOrder',
   ShowOrders = 'showOrders',
   ExportOrders = 'exportOrders',
+  Conversation = 'conversation',
 }
+
+/**
+ * Get the session storage for the given session name
+ * @param sessionName. The name of the session to get the storage for
+ */
+const getSessionStorage = <T>(sessionName: ConversationSession) => {
+  return new FileAdapter<T>({
+    dirName: `./sessions/${sessionName}`,
+  });
+};
 
 /**
  * Initialize all conversations
@@ -30,6 +42,7 @@ export const initConversations = (bot: Bot<BotContext>) => {
           duration: 0,
           delivery_date: '',
         }),
+        storage: getSessionStorage<OrderData>(ConversationSession.CreateOrder),
       },
       [ConversationSession.ChangeOrder]: {
         initial: (): OrderData => ({
@@ -40,13 +53,19 @@ export const initConversations = (bot: Bot<BotContext>) => {
           duration: 0,
           delivery_date: '',
         }),
+        storage: getSessionStorage<OrderData>(ConversationSession.ChangeOrder),
       },
       [ConversationSession.ShowOrders]: {},
+      [ConversationSession.ExportOrders]: {
+        storage: getSessionStorage<never>(ConversationSession.ExportOrders),
+      },
       /**
        * To store conversations per session
        * @see https://t.me/grammyjs/268859
        */
-      conversation: {},
+      [ConversationSession.Conversation]: {
+        storage: getSessionStorage<never>(ConversationSession.Conversation),
+      },
     }),
   );
 

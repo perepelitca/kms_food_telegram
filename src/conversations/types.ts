@@ -9,7 +9,7 @@ export type OrderData = Pick<
   'first_name' | 'last_name' | 'phone' | 'address' | 'duration' | 'delivery_date' | 'comments'
 >;
 
-interface SessionData {
+export interface SessionData {
   /**
    * The data for the order that is currently being created
    */
@@ -24,6 +24,11 @@ interface SessionData {
    * The data for the order that is currently being shown
    */
   [ConversationSession.ShowOrders]: DbOrder | null;
+
+  /**
+   * The data for the order that is currently being shown
+   */
+  [ConversationSession.ExportOrders]: never;
 
   /**
    * To store conversations per session

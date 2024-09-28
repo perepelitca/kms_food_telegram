@@ -25,4 +25,6 @@ export const getOrder = async (conversation: BotConversation, ctx: BotContext): 
 
   conversation.session.showOrders = lastOrder;
   await showOrderInfo(ctx, lastOrder, 'вот ваш последний заказ!');
+
+  return;
 };

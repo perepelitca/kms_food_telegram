@@ -52,4 +52,6 @@ export const changeOrder = async (conversation: BotConversation, ctx: BotContext
   if (updatedOrder) {
     await showOrderInfo(ctx, updatedOrder, 'ваш заказ обновлен!');
   }
+
+  return;
 };

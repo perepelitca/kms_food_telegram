@@ -72,7 +72,11 @@ export const exportOrders = async (conversation: BotConversation, ctx: BotContex
   const exportResponse = await conversation.waitForCallbackQuery(
     new RegExp(`^(${additionDayPattern})$`),
     {
-      otherwise: (ctx) => ctx.reply('Выберите день!', { reply_markup: createExportPicker() }),
+      otherwise: async (ctx) => {
+        {
+          await ctx.reply('Выберите день из меню!');
+        }
+      },
     },
   );
 
