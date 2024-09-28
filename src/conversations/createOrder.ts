@@ -90,10 +90,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
     reply_markup: createMonthPicker(),
     parse_mode: 'MarkdownV2',
   });
-  const monthResponse = await conversation.waitForCallbackQuery(/^select_month:(current|next)$/, {
-    otherwise: (ctx) => ctx.reply('Выберите месяц!'),
-  });
-
+  const monthResponse = await conversation.waitForCallbackQuery(/^select_month:(current|next)$/);
   const currentDate = getZonedDate();
   const selectedMonth =
     monthResponse.match[1] === 'current' ? currentDate : addMonths(currentDate, 1);
@@ -103,9 +100,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
     reply_markup: createDayPicker(selectedMonth),
     parse_mode: 'MarkdownV2',
   });
-  const dayResponse = await conversation.waitForCallbackQuery(/^select_day:(\d{4}-\d{2}-\d{2})$/, {
-    otherwise: (ctx) => ctx.reply('Выберите дату!'),
-  });
+  const dayResponse = await conversation.waitForCallbackQuery(/^select_day:(\d{4}-\d{2}-\d{2})$/);
   createOrderSession.delivery_date = dateStringToUtcIso(dayResponse.match[1] ?? '');
 
   // First name

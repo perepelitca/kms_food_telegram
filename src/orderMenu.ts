@@ -10,7 +10,7 @@ export const orderMenu = new Menu<BotContext>('order-menu')
       );
     },
     async (ctx) => {
-      await ctx.conversation.enter(ConversationSession.CreateOrder);
+      await ctx.conversation.enter(ConversationSession.CreateOrder, { overwrite: true });
       ctx.menu.close();
     },
   )
@@ -21,7 +21,7 @@ export const orderMenu = new Menu<BotContext>('order-menu')
     },
     async (ctx) => {
       ctx.menu.close();
-      await ctx.conversation.enter(ConversationSession.ChangeOrder);
+      await ctx.conversation.enter(ConversationSession.ChangeOrder, { overwrite: true });
     },
   )
   .row()
@@ -31,7 +31,7 @@ export const orderMenu = new Menu<BotContext>('order-menu')
     },
     async (ctx) => {
       ctx.menu.close();
-      await ctx.conversation.enter(ConversationSession.ShowOrders);
+      await ctx.conversation.enter(ConversationSession.ShowOrders, { overwrite: true });
     },
   )
   .row();

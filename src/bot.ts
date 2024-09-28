@@ -35,11 +35,13 @@ bot.api.setMyCommands([
 ]);
 
 bot.command('start', async (ctx) => {
+  await ctx.conversation.exit(ConversationSession.ExportOrders);
   await ctx.reply('Давайте начнем!', { reply_markup: orderMenu });
 });
 
 bot.command('export', async (ctx) => {
-  await ctx.conversation.enter(ConversationSession.ExportOrders);
+  await ctx.conversation.exit(ConversationSession.CreateOrder);
+  await ctx.conversation.enter(ConversationSession.ExportOrders, { overwrite: true });
 });
 
 bot.command('drop_admins', async (ctx) => {
