@@ -43,21 +43,34 @@ const additionDayPattern = additionDays.map((day) => `export:${day}`).join('|');
  */
 export const exportOrders = async (conversation: BotConversation, ctx: BotContext) => {
   const userId = ctx.from?.id;
-  const isAdminUser = userId && (await isAdmin(String(userId)));
+  /**
+   * Golden Rule 1: All Side-effects Must Be Wrapped
+   * @see https://grammy.dev/plugins/conversations#rule-i-all-side-effects-must-be-wrapped
+   */
+  const isAdminUser = userId && (await conversation.external(() => isAdmin(String(userId))));
 
   if (!isAdminUser) {
     await ctx.reply(ctx.emoji`${'locked'} Введите пароль администратора`);
     const { message: password, msgId } = await conversation.waitFor(':text', {});
-    const match = await bcrypt.compare(password?.text ?? '', process.env.PASSWORD_HASH as string);
+    /**
+     * Golden Rule 1: All Side-effects Must Be Wrapped
+     * @see https://grammy.dev/plugins/conversations#rule-i-all-side-effects-must-be-wrapped
+     */
+    const isCorrectPassword = await conversation.external(() =>
+      bcrypt.compare(password?.text ?? '', process.env.PASSWORD_HASH as string),
+    );
 
-    if (!match) {
+    if (!isCorrectPassword) {
       await ctx.reply(ctx.emoji`${'no_entry'} Access denied! ${'no_entry'}`);
       return;
     } else if (userId) {
       /** Delete the password message after receiving it.
        * This is to prevent the password from being stored in the chat
        */
-      await ctx.api.deleteMessage(ctx.chat?.id as number, msgId);
+      if (ctx.chat?.id) {
+        await ctx.api.deleteMessage(ctx.chat.id, msgId);
+      }
+
       /**
        * Add user to admin list if password is correct so that they don't have to enter a password again
        */
@@ -72,6 +85,10 @@ export const exportOrders = async (conversation: BotConversation, ctx: BotContex
   const exportResponse = await conversation.waitForCallbackQuery(
     new RegExp(`^(${additionDayPattern})$`),
   );
+  // Delete the export message after receiving the response to avoid accidental clicking on other dates
+  if (ctx.chat?.id && exportResponse?.msgId) {
+    await ctx.api.deleteMessage(ctx.chat.id, exportResponse.msgId);
+  }
 
   const exportDay: AdditionDay =
     (exportResponse.match[1]?.split(':')?.[1] as AdditionDay) ?? 'today';

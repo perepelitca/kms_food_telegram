@@ -10,6 +10,9 @@ lerna-debug.log*
 .idea/
 .idea/*
 
+# Grammy conversation sessions
+sessions/
+
 # ignore orders.db
 orders.db
 
