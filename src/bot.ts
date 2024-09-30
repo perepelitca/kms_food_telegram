@@ -14,7 +14,7 @@ dotenv.config();
 (async () => {
   await initializeDb();
 })();
-console.log(JSON.stringify(process.env, null, 2));
+
 const TelegramToken = process.env.TELEGRAM_TOKEN as string;
 export const bot = new Bot<BotContext>(TelegramToken);
 

@@ -1,10 +1,9 @@
-import { isAdmin, addAdmin } from '../db';
 import { InputFile } from 'grammy';
 import type { BotConversation, BotContext } from './types';
 import { generateExcelFromQuery } from '../helpers/export';
 import fs from 'fs';
-import bcrypt from 'bcrypt';
 import { dateToUtcIso, utcToZonedTime } from '../helpers/datetime';
+import { validateAdminAccess } from '../helpers/validateAdminAccess';
 import { InlineKeyboard } from 'grammy';
 import { addDays } from 'date-fns';
 
@@ -42,40 +41,10 @@ const additionDayPattern = additionDays.map((day) => `export:${day}`).join('|');
  * Export orders to Excel file. Only admin users can export orders.
  */
 export const exportOrders = async (conversation: BotConversation, ctx: BotContext) => {
-  const userId = ctx.from?.id;
-  /**
-   * Golden Rule 1: All Side-effects Must Be Wrapped
-   * @see https://grammy.dev/plugins/conversations#rule-i-all-side-effects-must-be-wrapped
-   */
-  const isAdminUser = userId && (await conversation.external(() => isAdmin(String(userId))));
+  const isAdminUser = await validateAdminAccess(conversation, ctx);
 
   if (!isAdminUser) {
-    await ctx.reply(ctx.emoji`${'locked'} Введите пароль администратора`);
-    const { message: password, msgId } = await conversation.waitFor(':text', {});
-    /**
-     * Golden Rule 1: All Side-effects Must Be Wrapped
-     * @see https://grammy.dev/plugins/conversations#rule-i-all-side-effects-must-be-wrapped
-     */
-    const isCorrectPassword = await conversation.external(() =>
-      bcrypt.compare(password?.text ?? '', process.env.PASSWORD_HASH as string),
-    );
-
-    if (!isCorrectPassword) {
-      await ctx.reply(ctx.emoji`${'no_entry'} Access denied! ${'no_entry'}`);
-      return;
-    } else if (userId) {
-      /** Delete the password message after receiving it.
-       * This is to prevent the password from being stored in the chat
-       */
-      if (ctx.chat?.id) {
-        await ctx.api.deleteMessage(ctx.chat.id, msgId);
-      }
-
-      /**
-       * Add user to admin list if password is correct so that they don't have to enter a password again
-       */
-      await addAdmin(String(userId));
-    }
+    return;
   }
 
   await ctx.reply(`***Что загрузить?***`, {
