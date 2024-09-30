@@ -8,25 +8,55 @@ import {
   isTodayBeforeTime,
   dateStringToUtcIso,
   dayFormat,
+  hourDeadlineDeliveryAccept,
 } from '../helpers/datetime';
-import { addMonths, getDaysInMonth, isBefore } from 'date-fns';
+import { addMonths, getDaysInMonth, isBefore, getDate } from 'date-fns';
 import { format } from 'date-fns-tz';
 import { showOrderInfo } from '../helpers/showOrderInfo';
 
 const commentEmptyValues = [' ', '-', 'нет', '_'];
 
+interface ICreateMonthPicker {
+  /**
+   * The keyboard to select a month
+   */
+  keyboard: InlineKeyboard;
+  /**
+   * The first month date
+   */
+  firstMonthDate: Date;
+  /**
+   * The second month date
+   */
+  secondMonthDate: Date;
+}
+
 // Generate a keyboard for the user to select a month
-export const createMonthPicker = (): InlineKeyboard => {
+export const createMonthPicker = (): ICreateMonthPicker => {
   const currentDate = getZonedDate();
-  const nextMonthDate = addMonths(currentDate, 1);
 
-  const currentMonth = format(currentDate, 'MMMM yyyy', { timeZone: TimeZone });
-  const nextMonth = format(nextMonthDate, 'MMMM yyyy', { timeZone: TimeZone });
+  /**
+   * If it's the last day of the month and past 9 AM, skip to the next month.
+   * E.g. if today is 31st of January, and it's past 9 AM, skip to February.
+   */
+  const isLastDayOfMonth = getDate(currentDate) === getDaysInMonth(currentDate);
+  const shouldSkipCurrentMonth =
+    isLastDayOfMonth && !isTodayBeforeTime(currentDate, hourDeadlineDeliveryAccept);
 
-  return new InlineKeyboard()
-    .text(currentMonth, 'select_month:current')
+  const firstMonthDate = shouldSkipCurrentMonth
+    ? addMonths(currentDate, 1) // Skip current month
+    : currentDate;
+  const secondMonthDate = addMonths(firstMonthDate, 1);
+
+  const firstMonth = format(firstMonthDate, 'MMMM yyyy', { timeZone: TimeZone });
+  const secondMonth = format(secondMonthDate, 'MMMM yyyy', { timeZone: TimeZone });
+
+  const keyboard = new InlineKeyboard()
+    .text(firstMonth, 'select_month:first')
     .row()
-    .text(nextMonth, 'select_month:next');
+    .text(secondMonth, 'select_month:second');
+
+  return { keyboard, firstMonthDate, secondMonthDate };
 };
 
 // Generate a keyboard to pick a day from a selected month
@@ -46,7 +76,7 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
     // Skip today if it's after 9am
     if (
       format(dayDate, dayFormat) === format(currentDate, dayFormat) &&
-      !isTodayBeforeTime(dayDate, 9)
+      !isTodayBeforeTime(dayDate, hourDeadlineDeliveryAccept)
     ) {
       continue;
     }
@@ -86,14 +116,14 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
 
   // Delivery date
   const monthEmoji = ctx.emoji`${'calendar'}`;
+  const { keyboard: monthKeyboard, firstMonthDate, secondMonthDate } = createMonthPicker();
   await ctx.reply(`***Выберите месяц:*** ${monthEmoji}`, {
-    reply_markup: createMonthPicker(),
+    reply_markup: monthKeyboard,
     parse_mode: 'MarkdownV2',
   });
-  const monthResponse = await conversation.waitForCallbackQuery(/^select_month:(current|next)$/);
-  const currentDate = getZonedDate();
-  const selectedMonth =
-    monthResponse.match[1] === 'current' ? currentDate : addMonths(currentDate, 1);
+  const monthResponse = await conversation.waitForCallbackQuery(/^select_month:(first|second)$/);
+  // Determine which month was selected
+  const selectedMonth = monthResponse.match[1] === 'first' ? firstMonthDate : secondMonthDate;
 
   const dayEmoji = ctx.emoji`${'sun'}`;
   await ctx.reply(`***Выберите дату:*** ${dayEmoji}`, {

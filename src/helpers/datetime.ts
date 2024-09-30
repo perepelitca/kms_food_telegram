@@ -2,6 +2,12 @@ import { format, toZonedTime } from 'date-fns-tz';
 import { isBefore, isSameDay, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
+// The hour deadline for accepting delivery orders for today, e.g. for today's delivery, the order must be placed before 9 AM
+export const hourDeadlineDeliveryAccept = 9;
+
+// The hour deadline for changing delivery orders for today, e.g. for today's delivery, the order can be changed before 3 PM
+export const hourDeadlineDeliveryChange = 15;
+
 // The timezone of the Far East region of Russia.
 export const TimeZone = 'Asia/Vladivostok';
 
@@ -85,7 +91,7 @@ export const canChangeOrder = (deliveryDate: string): boolean => {
 
   // If the delivery date is today, check if it's already past 3 PM
   if (isDeliveryToday) {
-    return isTodayBeforeTime(now, 15);
+    return isTodayBeforeTime(now, hourDeadlineDeliveryChange);
   }
 
   // If the delivery date is not today (i.e., it's in the future), the order can still be modified
