@@ -31,6 +31,12 @@ export interface SessionData {
   [ConversationSession.ExportOrders]: never;
 
   /**
+   * Service session to store the conversation for dropping orders and admins
+   */
+  [ConversationSession.DropOrders]: never;
+  [ConversationSession.DropAdmins]: never;
+
+  /**
    * To store conversations per session
    * @see https://t.me/grammyjs/268859
    */

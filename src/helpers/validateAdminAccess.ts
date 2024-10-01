@@ -10,7 +10,7 @@ import type { BotContext, BotConversation } from '../conversations/types';
 export const validateAdminAccess = async (
   conversation: BotConversation,
   ctx: BotContext,
-): Promise<boolean | undefined> => {
+): Promise<boolean> => {
   const userId = ctx.from?.id;
   /**
    * Golden Rule 1: All Side-effects Must Be Wrapped

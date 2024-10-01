@@ -3,6 +3,7 @@ import { createOrder } from './createOrder';
 import { changeOrder } from './changeOrder';
 import { exportOrders } from './exportOrders';
 import { showOrders } from './showOrders';
+import { dropOrders } from './dropOrders';
 import { conversations, createConversation } from '@grammyjs/conversations';
 import type { BotContext, OrderData } from './types';
 import { FileAdapter } from '@grammyjs/storage-file';
@@ -12,6 +13,8 @@ export enum ConversationSession {
   ChangeOrder = 'changeOrder',
   ShowOrders = 'showOrders',
   ExportOrders = 'exportOrders',
+  DropOrders = 'dropOrders',
+  DropAdmins = 'dropAdmins',
   Conversation = 'conversation',
 }
 
@@ -56,6 +59,8 @@ export const initConversations = (bot: Bot<BotContext>) => {
         storage: getSessionStorage<OrderData>(ConversationSession.ChangeOrder),
       },
       [ConversationSession.ShowOrders]: {},
+      [ConversationSession.DropOrders]: {},
+      [ConversationSession.DropAdmins]: {},
       [ConversationSession.ExportOrders]: {
         storage: getSessionStorage<never>(ConversationSession.ExportOrders),
       },
@@ -74,4 +79,5 @@ export const initConversations = (bot: Bot<BotContext>) => {
   bot.use(createConversation(changeOrder));
   bot.use(createConversation(exportOrders));
   bot.use(createConversation(showOrders));
+  bot.use(createConversation(dropOrders));
 };
