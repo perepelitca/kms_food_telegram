@@ -1,6 +1,6 @@
 import { Bot, GrammyError, HttpError } from 'grammy';
 import dotenv from 'dotenv';
-import { initializeDb, dropAdmins } from './db';
+import { initializeDb } from './db';
 import type { BotContext } from './conversations/types';
 import { initConversations } from './conversations';
 import { orderMenu } from './orderMenu';
@@ -45,8 +45,7 @@ bot.command('export', async (ctx) => {
 });
 
 bot.command('drop_admins', async (ctx) => {
-  await dropAdmins();
-  await ctx.reply('All admins have been deleted');
+  await ctx.conversation.enter(ConversationSession.DropAdmins, { overwrite: true });
 });
 
 bot.command('drop_orders', async (ctx) => {

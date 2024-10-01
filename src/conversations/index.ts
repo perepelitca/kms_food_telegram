@@ -4,6 +4,7 @@ import { changeOrder } from './changeOrder';
 import { exportOrders } from './exportOrders';
 import { showOrders } from './showOrders';
 import { dropOrders } from './dropOrders';
+import { dropAdmins } from './dropAdmins';
 import { conversations, createConversation } from '@grammyjs/conversations';
 import type { BotContext, OrderData } from './types';
 import { FileAdapter } from '@grammyjs/storage-file';
@@ -80,4 +81,5 @@ export const initConversations = (bot: Bot<BotContext>) => {
   bot.use(createConversation(exportOrders));
   bot.use(createConversation(showOrders));
   bot.use(createConversation(dropOrders));
+  bot.use(createConversation(dropAdmins));
 };
