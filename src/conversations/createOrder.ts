@@ -14,6 +14,7 @@ import {
   addMonths,
   getDaysInMonth,
   isBefore,
+  startOfDay,
   getDate,
   addDays,
   subDays,
@@ -87,7 +88,7 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
   const deliveryDate = isTodayBeforeTime(currentDate, hourDeadlineDeliveryAccept)
     ? currentDate // Delivery today, eating tomorrow
     : addDays(currentDate, 1); // Delivery tomorrow, eating the day after tomorrow
-  const firstEatingDate = addDays(deliveryDate, 1); // Eating day is the day after delivery
+  const firstEatingDate = startOfDay(addDays(deliveryDate, 1)); // Eating day is the day after delivery
 
   const daysInMonth = getDaysInMonth(selectedMonth);
   const keyboard = new InlineKeyboard();
@@ -97,8 +98,8 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
   console.log('First Eating Date:', firstEatingDate);
 
   for (let day = 1; day <= daysInMonth; day++) {
-    const dayDate = getZonedDate(
-      new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day),
+    const dayDate = startOfDay(
+      getZonedDate(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day)),
     );
 
     // Skip past dates or skip the delivery day itself
