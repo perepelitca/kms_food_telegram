@@ -36,6 +36,7 @@ export const initializeDb = async () => {
       phone TEXT,
       address TEXT,
       delivery_date TEXT,
+      eating_date TEXT,
       duration INTEGER,
       comments TEXT,
       order_date TEXT,
@@ -85,6 +86,10 @@ export interface DbOrder {
    */
   delivery_date: string;
   /**
+   * The date and time when the order should be eaten, it is the next day after delivery
+   */
+  eating_date: string;
+  /**
    * The duration of the order in days
    */
   duration: number;
@@ -117,13 +122,14 @@ export const addOrder = async ({
   address,
   comments,
   delivery_date,
+  eating_date,
   duration,
   phone,
 }: Order): Promise<void> => {
   const db = await dbPromise();
   const orderTimestamp = dateToUtcIso();
   await db.run(
-    'INSERT INTO orders (user_id, first_name, last_name, phone, address, comments, delivery_date, duration, order_date, last_updated) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?)',
+    'INSERT INTO orders (user_id, first_name, last_name, phone, address, comments, delivery_date, eating_date, duration, order_date, last_updated) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?)',
     [
       user_id,
       first_name,
@@ -132,6 +138,7 @@ export const addOrder = async ({
       address,
       comments,
       delivery_date,
+      eating_date,
       duration,
       orderTimestamp,
       // When order is created, `last updated` is the same as `order date`

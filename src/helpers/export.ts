@@ -9,6 +9,7 @@ const headerMapping: Record<keyof ExcelRow, string> = {
   first_name: 'Имя',
   last_name: 'Фaмилия',
   delivery_date: 'Дата начала доставки',
+  eating_date: 'Дата начала рациона',
   order_date: 'Дата заказа',
   last_updated: 'Последнее обновление',
   duration: 'Количество дней',
@@ -18,7 +19,7 @@ const headerMapping: Record<keyof ExcelRow, string> = {
 };
 
 const dateFieldsWithTime = ['last_updated', 'order_date'];
-const dateFields = ['delivery_date'];
+const dateFields = ['delivery_date', 'eating_date'];
 
 /**
  * Generate an Excel file from the orders where the delivery date is today.
@@ -40,7 +41,7 @@ export const generateExcelFromQuery = async (
    * Started before the target date but are still active on the target date due to their duration.
    */
   const query = `
-  SELECT first_name, last_name, phone, address, delivery_date, 
+  SELECT first_name, last_name, phone, address, delivery_date, eating_date,
          order_date, last_updated, duration, comments 
   FROM orders
   WHERE (

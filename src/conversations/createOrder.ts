@@ -10,7 +10,16 @@ import {
   dayFormat,
   hourDeadlineDeliveryAccept,
 } from '../helpers/datetime';
-import { addMonths, getDaysInMonth, isBefore, getDate, addDays } from 'date-fns';
+import {
+  addMonths,
+  getDaysInMonth,
+  isBefore,
+  getDate,
+  addDays,
+  subDays,
+  parseISO,
+  formatISO,
+} from 'date-fns';
 import { format } from 'date-fns-tz';
 import { showOrderInfo } from '../helpers/showOrderInfo';
 
@@ -141,7 +150,11 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
     parse_mode: 'MarkdownV2',
   });
   const dayResponse = await conversation.waitForCallbackQuery(/^select_day:(\d{4}-\d{2}-\d{2})$/);
-  createOrderSession.delivery_date = dateStringToUtcIso(dayResponse.match[1] ?? '');
+  createOrderSession.eating_date = dateStringToUtcIso(dayResponse.match[1] ?? '');
+  // Calculate the delivery date, which is the day before eating
+  createOrderSession.delivery_date = formatISO(
+    subDays(parseISO(createOrderSession.eating_date), 1),
+  );
 
   // First name
   const firstNameEmoji = ctx.emoji`${'person_raising_hand'}`;
@@ -197,7 +210,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
   const userComments = message?.text ?? '';
   createOrderSession.comments = commentEmptyValues.includes(userComments) ? '' : userComments;
 
-  const { first_name, last_name, phone, address, duration, comments, delivery_date } =
+  const { first_name, last_name, phone, address, duration, comments, eating_date, delivery_date } =
     createOrderSession;
 
   await addOrder({
@@ -208,6 +221,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
     phone,
     address,
     delivery_date,
+    eating_date,
     duration,
   });
 

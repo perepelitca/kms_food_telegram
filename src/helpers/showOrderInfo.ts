@@ -8,7 +8,7 @@ import { utcToZonedTime } from './datetime';
  * @param message. Message to show
  */
 export const showOrderInfo = async (ctx: BotContext, order: OrderData, message: string) => {
-  const { first_name, phone, address, duration, comments, delivery_date } = order;
+  const { first_name, phone, address, duration, comments, delivery_date, eating_date } = order;
 
   await ctx.reply(
     `
@@ -17,8 +17,8 @@ export const showOrderInfo = async (ctx: BotContext, order: OrderData, message: 
 Телефон:                ${phone}
 Адрес:                  ${address}
 На сколько дней:        ${duration}
-Когда привезем:         ${utcToZonedTime(delivery_date, { subDaysCount: 1 })}
-Дата начала рациона:    ${utcToZonedTime(delivery_date)}
+Когда привезем:         ${utcToZonedTime(delivery_date)}
+Дата начала рациона:    ${utcToZonedTime(eating_date)}
 Комментарии:            ${comments}
 </pre>
 `,

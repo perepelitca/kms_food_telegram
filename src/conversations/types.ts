@@ -6,7 +6,14 @@ import { ConversationSession } from './index';
 
 export type OrderData = Pick<
   DbOrder,
-  'first_name' | 'last_name' | 'phone' | 'address' | 'duration' | 'delivery_date' | 'comments'
+  | 'first_name'
+  | 'last_name'
+  | 'phone'
+  | 'address'
+  | 'duration'
+  | 'delivery_date'
+  | 'eating_date'
+  | 'comments'
 >;
 
 export interface SessionData {
