@@ -66,7 +66,7 @@ export const exportOrders = async (conversation: BotConversation, ctx: BotContex
   await ctx.reply(ctx.emoji`${'check_mark_button'} Ищем заказы на ${dayLabel}...`);
 
   try {
-    const filename = `${utcToZonedTime(dateToUtcIso(addDays(new Date(), addDay)), 'P')} Заказы.xlsx`;
+    const filename = `${utcToZonedTime(dateToUtcIso(addDays(new Date(), addDay)), { formatStr: 'P' })} Заказы.xlsx`;
     // Define the file path where the Excel file will be saved
     const filePath = `./${filename}`;
     // Generate the Excel file

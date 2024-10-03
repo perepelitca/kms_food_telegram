@@ -10,7 +10,7 @@ import {
   dayFormat,
   hourDeadlineDeliveryAccept,
 } from '../helpers/datetime';
-import { addMonths, getDaysInMonth, isBefore, getDate } from 'date-fns';
+import { addMonths, getDaysInMonth, isBefore, getDate, addDays } from 'date-fns';
 import { format } from 'date-fns-tz';
 import { showOrderInfo } from '../helpers/showOrderInfo';
 
@@ -36,16 +36,27 @@ export const createMonthPicker = (): ICreateMonthPicker => {
   const currentDate = getZonedDate();
 
   /**
+   * Calculate the eating day, which is the day after delivery.
+   * If it's before 9 AM, the delivery will be today, and the eating day is tomorrow.
+   * If it's after 9 AM, the delivery will be tomorrow, and the eating day is the day after tomorrow.
+   */
+  const deliveryDate = isTodayBeforeTime(currentDate, hourDeadlineDeliveryAccept)
+    ? currentDate // Delivery today
+    : addDays(currentDate, 1); // Delivery tomorrow
+  const eatingDate = addDays(deliveryDate, 1); // Eating day (next day after delivery)
+  console.log(eatingDate);
+
+  /**
    * If it's the last day of the month and past 9 AM, skip to the next month.
    * E.g. if today is 31st of January, and it's past 9 AM, skip to February.
    */
-  const isLastDayOfMonth = getDate(currentDate) === getDaysInMonth(currentDate);
+  const isLastDayOfMonth = getDate(eatingDate) === getDaysInMonth(eatingDate);
   const shouldSkipCurrentMonth =
-    isLastDayOfMonth && !isTodayBeforeTime(currentDate, hourDeadlineDeliveryAccept);
+    isLastDayOfMonth && !isTodayBeforeTime(eatingDate, hourDeadlineDeliveryAccept);
 
   const firstMonthDate = shouldSkipCurrentMonth
-    ? addMonths(currentDate, 1) // Skip current month
-    : currentDate;
+    ? addMonths(eatingDate, 1) // Skip current month
+    : eatingDate;
   const secondMonthDate = addMonths(firstMonthDate, 1);
 
   const firstMonth = format(firstMonthDate, 'MMMM yyyy', { timeZone: TimeZone });
@@ -62,6 +73,13 @@ export const createMonthPicker = (): ICreateMonthPicker => {
 // Generate a keyboard to pick a day from a selected month
 export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
   const currentDate = getZonedDate();
+
+  // Calculate the first valid eating day
+  const deliveryDate = isTodayBeforeTime(currentDate, hourDeadlineDeliveryAccept)
+    ? currentDate // Delivery today, eating tomorrow
+    : addDays(currentDate, 1); // Delivery tomorrow, eating the day after tomorrow
+  const firstEatingDate = addDays(deliveryDate, 1); // Eating day is the day after delivery
+
   const daysInMonth = getDaysInMonth(selectedMonth);
   const keyboard = new InlineKeyboard();
 
@@ -70,16 +88,8 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
       new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day),
     );
 
-    // Skip past dates
-    if (isBefore(dayDate, currentDate)) continue;
-
-    // Skip today if it's after 9am
-    if (
-      format(dayDate, dayFormat) === format(currentDate, dayFormat) &&
-      !isTodayBeforeTime(dayDate, hourDeadlineDeliveryAccept)
-    ) {
-      continue;
-    }
+    // Skip past dates or skip the delivery day itself
+    if (isBefore(dayDate, firstEatingDate)) continue;
 
     const dayLabel = format(dayDate, 'd');
     keyboard.text(dayLabel, `select_day:${format(dayDate, dayFormat)}`);
@@ -114,7 +124,7 @@ export const createOrder = async (conversation: BotConversation, ctx: BotContext
     return true;
   });
 
-  // Delivery date
+  // Eating date. This is different from the delivery date. The eating date is the day after delivery.
   const monthEmoji = ctx.emoji`${'calendar'}`;
   const { keyboard: monthKeyboard, firstMonthDate, secondMonthDate } = createMonthPicker();
   await ctx.reply(`***Выберите месяц:*** ${monthEmoji}`, {

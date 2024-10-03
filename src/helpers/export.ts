@@ -72,10 +72,10 @@ export const generateExcelFromQuery = async (
 
         if (dateFieldsWithTime.includes(key)) {
           // Print dates in a format 'P HH:mm' (e.g. '2024-09-27T15:00:00.000' -> '09/27/2024 15:00')
-          formattedRow[headerKey] = utcToZonedTime(value as string, 'P HH:mm');
+          formattedRow[headerKey] = utcToZonedTime(value as string, { formatStr: 'P HH:mm' });
         } else if (dateFields.includes(key)) {
           // Print dates in a format 'P HH:mm' (e.g. '2024-09-27T15:00:00.000' -> 'Sep 27, 2024')
-          formattedRow[headerKey] = utcToZonedTime(value as string, 'PP');
+          formattedRow[headerKey] = utcToZonedTime(value as string, { formatStr: 'PP' });
         } else {
           formattedRow[headerKey] = value;
         }

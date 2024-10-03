@@ -14,11 +14,12 @@ export const showOrderInfo = async (ctx: BotContext, order: OrderData, message: 
     `
 <b>${first_name},</b> ${message} 🎉
 <pre>
-Телефон:          ${phone}
-Адрес:            ${address}
-На сколько дней:  ${duration}
-Дата доставки:    ${utcToZonedTime(delivery_date)}
-Комментарии:      ${comments}
+Телефон:                ${phone}
+Адрес:                  ${address}
+На сколько дней:        ${duration}
+Когда привезем:         ${utcToZonedTime(delivery_date, { subDaysCount: 1 })}
+Дата начала рациона:    ${utcToZonedTime(delivery_date)}
+Комментарии:            ${comments}
 </pre>
 `,
     { parse_mode: 'HTML' },

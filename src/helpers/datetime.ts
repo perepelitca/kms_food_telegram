@@ -1,5 +1,5 @@
 import { format, toZonedTime } from 'date-fns-tz';
-import { isBefore, isSameDay, parseISO } from 'date-fns';
+import { isBefore, isSameDay, parseISO, subDays } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 // The hour deadline for accepting delivery orders for today, e.g. for today's delivery, the order must be placed before 9 AM
@@ -33,15 +33,24 @@ export const dateStringToUtcIso = (dateStr: string): string =>
 /**
  * Convert a UTC date string to the default app timezone.
  * @param date. UTC ISO formatted date string.
- * @param formatStr. The format to convert the date to. Defaults to `PP` ('Sep 18, 2024')
- * @example `2024-09-19T03:33:45.283Z` (Toronto 11.33 PM) -> `Sep 19, 2024` (Vladivostok 3.33 PM)
+ * @param options. The options to customize the conversion.
+ * formatStr. The format to convert the date to. Defaults to `PP` ('Sep 18, 2024')
+ * subDaysCount. The number of days to subtract from the date. Defaults to 0.
  */
-export const utcToZonedTime = (date: string, formatStr = 'PP'): string => {
+export const utcToZonedTime = (
+  date: string,
+  options: { formatStr?: string; subDaysCount?: number } = {},
+): string => {
+  const { formatStr = 'PP', subDaysCount = 0 } = options;
+
   // Parse the UTC date
   const parsedDate = parseISO(date);
 
+  // Subtract one day from the parsed date
+  const adjustedDate = subDays(parsedDate, subDaysCount);
+
   // Convert the parsed UTC date to Asia/Vladivostok time zone
-  const zonedDate = toZonedTime(parsedDate, TimeZone);
+  const zonedDate = toZonedTime(adjustedDate, TimeZone);
 
   // Convert the stored UTC date to the Asia/Vladivostok timezone
   return format(zonedDate, formatStr, { locale: ru });
