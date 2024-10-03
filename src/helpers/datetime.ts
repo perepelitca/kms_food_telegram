@@ -69,17 +69,17 @@ export const getZonedDate = (date: Date | number = Date.now()): Date => {
  */
 export const isTodayBeforeTime = (date: Date, hour: number, minute: number = 0): boolean => {
   const currentDate = getZonedDate();
-  const providedDate = format(date, dayFormat, { timeZone: TimeZone });
-  const todayDate = format(currentDate, dayFormat, { timeZone: TimeZone });
 
-  if (providedDate !== todayDate) {
-    return false; // Not today
+  // Check if the provided date is today
+  if (!isSameDay(date, currentDate)) {
+    return false;
   }
 
-  // If it's today, check if the time is before the specified hour and minute
+  // Create a new Date object for the specific time (hour:minute) today
   const specificTimeToday = new Date(currentDate);
   specificTimeToday.setHours(hour, minute, 0, 0);
 
+  // Check if the current time is before the specific time today
   return isBefore(currentDate, specificTimeToday);
 };
 
