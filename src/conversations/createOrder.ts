@@ -92,6 +92,10 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
   const daysInMonth = getDaysInMonth(selectedMonth);
   const keyboard = new InlineKeyboard();
 
+  console.log('Current Date:', currentDate);
+  console.log('Delivery Date:', deliveryDate);
+  console.log('First Eating Date:', firstEatingDate);
+
   for (let day = 1; day <= daysInMonth; day++) {
     const dayDate = getZonedDate(
       new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day),
