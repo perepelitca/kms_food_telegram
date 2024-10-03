@@ -53,8 +53,7 @@ export const createMonthPicker = (): ICreateMonthPicker => {
   const deliveryDate = isTodayBeforeTime(currentDate, hourDeadlineDeliveryAccept)
     ? currentDate // Delivery today
     : addDays(currentDate, 1); // Delivery tomorrow
-  const eatingDate = addDays(deliveryDate, 1); // Eating day (next day after delivery)
-  console.log(eatingDate);
+  const eatingDate = startOfDay(addDays(deliveryDate, 1)); // Eating day (next day after delivery)
 
   /**
    * If it's the last day of the month and past 9 AM, skip to the next month.
@@ -65,9 +64,9 @@ export const createMonthPicker = (): ICreateMonthPicker => {
     isLastDayOfMonth && !isTodayBeforeTime(eatingDate, hourDeadlineDeliveryAccept);
 
   const firstMonthDate = shouldSkipCurrentMonth
-    ? addMonths(eatingDate, 1) // Skip current month
-    : eatingDate;
-  const secondMonthDate = addMonths(firstMonthDate, 1);
+    ? startOfDay(addMonths(eatingDate, 1)) // Skip current month
+    : startOfDay(eatingDate);
+  const secondMonthDate = startOfDay(addMonths(firstMonthDate, 1));
 
   const firstMonth = format(firstMonthDate, 'MMMM yyyy', { timeZone: TimeZone });
   const secondMonth = format(secondMonthDate, 'MMMM yyyy', { timeZone: TimeZone });
@@ -92,10 +91,6 @@ export const createDayPicker = (selectedMonth: Date): InlineKeyboard => {
 
   const daysInMonth = getDaysInMonth(selectedMonth);
   const keyboard = new InlineKeyboard();
-
-  console.log('Current Date:', currentDate);
-  console.log('Delivery Date:', deliveryDate);
-  console.log('First Eating Date:', firstEatingDate);
 
   for (let day = 1; day <= daysInMonth; day++) {
     const dayDate = startOfDay(
