@@ -1,0 +1,22 @@
+name: Deploy at 10 PM Toronto Time
+
+on:
+  schedule:
+    # Runs at 10:00 PM Toronto time (UTC-5/UTC-4), which is 3:00 AM or 2:00 AM UTC
+    - cron: '0 3 * 11-3 0' # Winter schedule (Standard Time)
+    - cron: '0 2 * 4-10 0' # Summer schedule (Daylight Saving Time)
+
+jobs:
+  trigger_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deploy Workflow
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const response = await github.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'deploy.yml',
+              ref: 'main'
+            });
