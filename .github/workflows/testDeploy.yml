@@ -2,10 +2,8 @@ name: Deploy at 10 PM Toronto Time
 
 on:
   schedule:
-    # Runs daily at 10:03 PM Toronto time (3:03 AM UTC) during Standard Time (November - March)
-    - cron: '3 3 * 11,12,1,2,3 *'
-    # Runs daily at 10:03 PM Toronto time (2:03 AM UTC) during Daylight Saving Time (April - October)
-    - cron: '3 2 * 4,5,6,7,8,9,10 *'
+    # Runs daily at 10:07 PM ET during winter time (3:07 AM UTC)
+    - cron: '7 3 * 11,12,1,2,3 *'
 
 jobs:
   trigger_deploy:
